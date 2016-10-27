@@ -51,16 +51,66 @@ function source_url_field_cb()
 }
 
 
+/**********************************************************************
+ * Plugin Section
+ **********************************************************************/
+/**********************************************************************
+ * Custom Short codes
+ * Render the custom fields by interfacting with the web service
+ **********************************************************************/
+
 function biclusters_hello() {
     echo "<p>Hello from Biclusters !</p>";
 }
 
-add_action('admin_init', 'biclusters_settings_init');
-add_action('admin_notices', 'biclusters_hello');
+function demo_shortcode($atts=[], $content=null)
+{
+    if ($content == null) {
+        $content = '';
+    }
+    $content .= 'This is rendered from demo shortcode';
+    return $content;
+}
 
 /**********************************************************************
- * Plugin Section
- * Render the custom fields by interfacting with the web service
+ * Custom post type (TODO)
+ * We can define custom bicluster pages using a custom post type
  **********************************************************************/
+
+/**********************************************************************
+ * Fake page
+ * We define a fake page for the bicluster slug, in order to
+ * avoid that the user has to create many real pages for each cluster
+ * To executed: the URL needs to have "<prefix>/index.php/biclusters"
+ * TODO: can we have user-defined page templates for bicluster info pages ?
+ **********************************************************************/
+function biclusters_fakepage_detect($posts)
+{
+    global $wp, $wp_query;
+    $plugin_slug = 'biclusters';
+    if ($wp->request == $plugin_slug) {
+        error_log("FAKE PAGE DETECTOR EXECUTED for biclusters plugin");
+        $post = new stdClass;
+        $post->post_author = 1;
+        $post->post_name = 'bicluster';
+        $post->post_title = 'Bicluster Information';
+        $posts = NULL;
+        $posts[] = $post;
+    }
+    return $posts;
+}
+
+
+
+function biclusters_init()
+{
+    add_shortcode('bicluster_demo', 'demo_shortcode');
+    add_filter('the_posts', 'biclusters_fakepage_detect');
+}
+
+add_action('admin_init', 'biclusters_settings_init');
+add_action('admin_notices', 'biclusters_hello');
+add_action('init', 'biclusters_init');
+
 
 ?>
