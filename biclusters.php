@@ -89,30 +89,74 @@ function biclusters_hello() {
     echo "<p>Hello from Biclusters !</p>";
 }
 
-function demo_shortcode($atts=[], $content=null)
-{
-    if ($content == null) {
-        $content = '';
-    }
-    $content .= 'This is rendered from demo shortcode';
-    return $content;
-}
-
 function bicluster_genes_shortcode($atts=[], $content=null)
 {
     if ($content == null) {
         $content = '';
     }
+    $atts = array_change_key_case((array)$atts, CASE_LOWER);
+    $use_microformats = $atts['microformats'] == "true";
+
     $source_url = get_option('source_url', '');
     $bicluster_num = get_query_var('bicluster');
     $row_membs_json = file_get_contents($source_url . "/api/v1.0.0/cluster_genes/" . $bicluster_num);
     $row_membs = json_decode($row_membs_json, true)["genes"];
+    $content .= "<ul style=\"font-size: 8pt\">";
     foreach ($row_membs as $m) {
         $content .= "<li>" . $m . "</li>";
     }
     $content .= "</ul>";
+    if ($use_microformats) {
+        $species = "Species (TODO)";
+        $content .= "<div class=\"gaggle-data\" style=\"display:none\">";
+        $content .= "  <span class=\"gaggle-name\">Row members cluster " . $bicluster_num . "</span>";
+        $content .= "  <span class=\"gaggle-species\">" . $species . "</span>";
+        $content .= "  <span class=\"gaggle-namelist\">";
+        $content .= "    <ol>";
+        foreach ($row_membs as $m) {
+            $content .= "<li>" . $m . "</li>";
+        }
+        $content .= "    </ol>";
+        $content .= "  </span>";
+        $content .= "</div>";
+    }
     return $content;
 }
+
+function bicluster_conditions_shortcode($atts=[], $content=null)
+{
+    if ($content == null) {
+        $content = '';
+    }
+    $atts = array_change_key_case((array)$atts, CASE_LOWER);
+    $use_microformats = $atts['microformats'] == "true";
+
+    $source_url = get_option('source_url', '');
+    $bicluster_num = get_query_var('bicluster');
+    $col_membs_json = file_get_contents($source_url . "/api/v1.0.0/cluster_conditions/" . $bicluster_num);
+    $col_membs = json_decode($col_membs_json, true)["conditions"];
+    $content .= "<ul>";
+    foreach ($col_membs as $m) {
+        $content .= "<li>" . $m . "</li>";
+    }
+    $content .= "</ul>";
+    if ($use_microformats) {
+        $species = "Species (TODO)";
+        $content .= "<div class=\"gaggle-data\" style=\"display:none\">";
+        $content .= "  <span class=\"gaggle-name\">Column members cluster " . $bicluster_num . "</span>";
+        $content .= "  <span class=\"gaggle-species\">" . $species . "</span>";
+        $content .= "  <span class=\"gaggle-namelist\">";
+        $content .= "    <ol>";
+        foreach ($col_membs as $m) {
+            $content .= "<li>" . $m . "</li>";
+        }
+        $content .= "    </ol>";
+        $content .= "  </span>";
+        $content .= "</div>";
+    }
+    return $content;
+}
+
 
 /**********************************************************************
  * Custom post type (TODO)
@@ -141,20 +185,6 @@ function biclusters_fakepage_detect($posts)
     error_log('bicluster: ' . get_query_var('bicluster'));
 
     if ($lead == $plugin_slug) {
-
-        /*
-        $content = "<div>";
-        $content .= "<h3>Row members</h3>";
-        $row_membs_json = file_get_contents($source_url . "/api/v1.0.0/cluster_genes/" . $bicluster_num);
-        $row_membs = json_decode($row_membs_json, true)["genes"];
-        $rm_list = "<p><ul>";
-        foreach ($row_membs as $m) {
-            $rm_list .= "<li>" . $m . "</li>";
-        }
-        $rm_list .= "</ul></p>";
-        $content .= $rm_list;
-        $content .= "</div>";
-        */
 
         error_log("FAKE PAGE DETECTOR EXECUTED for biclusters plugin");
         $post = new stdClass;
@@ -201,8 +231,8 @@ function add_query_vars_filter($vars) {
 
 function biclusters_init()
 {
-    add_shortcode('bicluster_demo', 'demo_shortcode');
     add_shortcode('bicluster_genes', 'bicluster_genes_shortcode');
+    add_shortcode('bicluster_conditions', 'bicluster_conditions_shortcode');
     add_filter('the_posts', 'biclusters_fakepage_detect');
     add_filter('query_vars', 'add_query_vars_filter');
 }
