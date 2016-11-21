@@ -85,10 +85,6 @@ function info_template_field_cb()
  * Render the custom fields by interfacting with the web service
  **********************************************************************/
 
-function biclusters_hello() {
-    echo "<p>Hello from Biclusters !</p>";
-}
-
 function bicluster_genes_shortcode($atts=[], $content=null)
 {
     if ($content == null) {
@@ -184,6 +180,38 @@ function bicluster_motifs_shortcode($atts=[], $content=null)
     return $content;
 }
 
+function model_overview_shortcode($attr=[], $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $summary_json = file_get_contents($source_url . "/api/v1.0.0/summary");
+    $summary = json_decode($summary_json, true);
+
+    if ($content == null) {
+        $content = '';
+    }
+    $content .= "<h2>Model Overview</h2>";
+    $content .= "<table id=\"summary\">";
+    $content .= "  <thead><tr><th>#</th><th>Description</th></tr></thead>";
+    $content .= "  <tbody>";
+    $content .= "    <tr><td>" . $summary["num_genes"] . "</td><td>Genes</td></tr>";
+    $content .= "    <tr><td>" . $summary["num_conditions"] . "</td><td>Conditions</td></tr>";
+    $content .= "    <tr><td>" . $summary["num_corems"] . "</td><td>Corems</td></tr>";
+    $content .= "    <tr><td>" . $summary["num_biclusters"] . "</td><td>Biclusters</td></tr>";
+    $content .= "    <tr><td>" . $summary["num_gres"] . "</td><td>GREs</td></tr>";
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#summary').DataTable({";
+    $content .= "      'paging': false,";
+    $content .= "      'info': false";
+    $content .= "      'searching': false";
+    $content .= "    })";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
 /**********************************************************************
  * Custom post type (TODO)
  * We can define custom bicluster pages using a custom post type
@@ -198,50 +226,57 @@ function bicluster_motifs_shortcode($atts=[], $content=null)
  * Example URL: http://localhost/~weiju/wordpress/index.php/bicluster/?bicluster=23
  **********************************************************************/
 
+function make_wp_post($posts, $post_name, $post_title, $post_content)
+{
+    global $wp_query;
+    $post = new stdClass;
+    $post->post_author = 1;
+    $post->post_name = $post_name;
+    $post->post_title = $post_title;
+    $post->post_content = $post_content;
+    $post->ID = -999;
+    $post->post_type = 'page';
+    $post->post_status = 'status';
+    $post->comment_status = 'closed';
+    $post->ping_status = 'open';
+    $post->comment_count = 0;
+    $post->post_date = current_time('mysql');
+    $post->post_date_gmt = current_time('mysql', 1);
+
+    $posts = NULL;
+    $posts[] = $post;
+
+    // information to wp_query
+    $wp_query->is_page = true;
+    $wp_query->is_singular = true;
+    $wp_query->is_home = false;
+    $wp_query->is_archive = false;
+    $wp_query->is_category = false;
+    unset($wp_query->query['error']);
+    $wp_query->query_vars['error'] = '';
+    $wp_query->is_404 = false;
+    return $posts;
+}
+
+
 function biclusters_fakepage_detect($posts)
 {
     global $wp, $wp_query;
     $plugin_slug =  get_option('bicluster_slug', 'biclusters');
     $source_url = get_option('source_url', '');
-    $content_template .= "<script src=" . $js_src . "></script>";
-    $content_template .= get_option('bicluster_info_template');
 
     $url_comps = explode('/', $wp->request);
     $lead = $url_comps[0];
-    $bicluster_num = get_query_var('bicluster');
-    error_log('bicluster: ' . get_query_var('bicluster'));
 
     if ($lead == $plugin_slug) {
-
+        $content_template = get_option('bicluster_info_template');
         error_log("FAKE PAGE DETECTOR EXECUTED for biclusters plugin");
-        $post = new stdClass;
-        $post->post_author = 1;
-        $post->post_name = 'bicluster';
-        $post->post_title = 'Information for Bicluster ' . $bicluster_num;
-        $post->post_content = $content_template; //$content;
-        $post->ID = -999;
-        $post->post_type = 'page';
-        $post->post_status = 'status';
-        $post->comment_status = 'closed';
-        $post->ping_status = 'open';
-        $post->comment_count = 0;
-        $post->post_date = current_time('mysql');
-        $post->post_date_gmt = current_time('mysql', 1);
+        $bicluster_num = get_query_var('bicluster');
+        error_log('bicluster: ' . get_query_var('bicluster'));
+        $posts = make_wp_post($posts, "bicluster", 'Information for Bicluster ' . $bicluster_num, $content_template);
 
-        $posts = NULL;
-        $posts[] = $post;
-
-        // information to wp_query
-        $wp_query->is_page = true;
-        $wp_query->is_singular = true;
-        $wp_query->is_home = false;
-        $wp_query->is_archive = false;
-        $wp_query->is_category = false;
-        unset($wp_query->query['error']);
-        $wp_query->query_vars['error'] = '';
-        $wp_query->is_404 = false;
     } else {
-        error_log("FAKE PAGE DETECTOR, unknown request: " . $url_comps[0] . ', ' . $url_comps[1]);
+        error_log("FAKE PAGE DETECTOR, unknown request: " . $url_comps[0]);
     }
     return $posts;
 }
@@ -258,19 +293,21 @@ function add_query_vars_filter($vars) {
 
 function biclusters_init()
 {
-    // This line will include ISBlogo in all pages that are used generated by this
-    // plugin
-    wp_enqueue_script('isblogo', plugin_dir_url(__FILE__) . 'isblogo.js', array('jquery'));
+    // add all javascript and style files that are used by our plugin
+    wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'));
+    wp_enqueue_style('datatables', plugin_dir_url(__FILE__) . 'css/jquery.dataTables.min.css');
+    wp_enqueue_script('isblogo', plugin_dir_url(__FILE__) . 'js/isblogo.js', array('jquery'));
 
     add_shortcode('bicluster_genes', 'bicluster_genes_shortcode');
     add_shortcode('bicluster_conditions', 'bicluster_conditions_shortcode');
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
+    add_shortcode('model_overview', 'model_overview_shortcode');
+
     add_filter('the_posts', 'biclusters_fakepage_detect');
     add_filter('query_vars', 'add_query_vars_filter');
 }
 
 add_action('admin_init', 'biclusters_settings_init');
-add_action('admin_notices', 'biclusters_hello');
 add_action('init', 'biclusters_init');
 
 
