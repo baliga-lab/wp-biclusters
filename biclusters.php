@@ -190,12 +190,12 @@ function model_overview_shortcode($attr=[], $content=null)
         $content = '';
     }
     $content .= "<h2>Model Overview</h2>";
-    $content .= "<table id=\"summary\">";
+    $content .= "<table id=\"summary\" class=\"row-border\">";
     $content .= "  <thead><tr><th>#</th><th>Description</th></tr></thead>";
     $content .= "  <tbody>";
     $content .= "    <tr><td>" . $summary["num_genes"] . "</td><td>Genes</td></tr>";
-    $content .= "    <tr><td>" . $summary["num_conditions"] . "</td><td>Conditions</td></tr>";
-    $content .= "    <tr><td>" . $summary["num_corems"] . "</td><td>Corems</td></tr>";
+    $content .= "    <tr><td><a href=\"index.php/conditions/\">" . $summary["num_conditions"] . "</a></td><td>Conditions</td></tr>";
+    $content .= "    <tr><td><a href=\"index.php/corems/\">" . $summary["num_corems"] . "</a></td><td>Corems</td></tr>";
     $content .= "    <tr><td>" . $summary["num_biclusters"] . "</td><td>Biclusters</td></tr>";
     $content .= "    <tr><td>" . $summary["num_gres"] . "</td><td>GREs</td></tr>";
     $content .= "  </tbody>";
@@ -211,6 +211,34 @@ function model_overview_shortcode($attr=[], $content=null)
     $content .= "</script>";
     return $content;
 }
+
+function corems_shortcode($attr=[], $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $corems_json = file_get_contents($source_url . "/api/v1.0.0/corems");
+    $corems = json_decode($corems_json, true)["corems"];
+
+    if ($content == null) {
+        $content = '';
+    }
+
+    $content .= "<table id=\"corems\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>Corem ID</th><th># Genes</th><th># Conditions</th><th>#GREs</th></tr></thead>";
+    $content .= "  <tbody>";
+    foreach ($corems as $c) {
+        $content .= "    <tr><td>" . $c["id"] . "</td><td>". $c["num_genes"] . "</td><td>" . $c["num_conds"] . "</td><td>(TODO)</td></tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#corems').DataTable({";
+    $content .= "    })";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
 
 /**********************************************************************
  * Custom post type (TODO)
@@ -294,14 +322,19 @@ function add_query_vars_filter($vars) {
 function biclusters_init()
 {
     // add all javascript and style files that are used by our plugin
-    wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'));
     wp_enqueue_style('datatables', plugin_dir_url(__FILE__) . 'css/jquery.dataTables.min.css');
+    wp_enqueue_style('wp-biclusters', plugin_dir_url(__FILE__) . 'css/wp-biclusters.css');
+
+    wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'));
     wp_enqueue_script('isblogo', plugin_dir_url(__FILE__) . 'js/isblogo.js', array('jquery'));
 
     add_shortcode('bicluster_genes', 'bicluster_genes_shortcode');
     add_shortcode('bicluster_conditions', 'bicluster_conditions_shortcode');
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
     add_shortcode('model_overview', 'model_overview_shortcode');
+
+    // EGRIN2 specific
+    add_shortcode('corems', 'corems_shortcode');
 
     add_filter('the_posts', 'biclusters_fakepage_detect');
     add_filter('query_vars', 'add_query_vars_filter');
