@@ -278,10 +278,10 @@ function genes_table_shortcode($attr=[], $content=null)
     }
 
     $content .= "<table id=\"genes\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Gene ID</th><th>Name</th><th>Common Name</th><th>Accession</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
+    $content .= "  <thead><tr><th>Name</th><th>Common Name</th><th>Accession</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($genes as $g) {
-        $content .= "    <tr><td>" . $g["id"] . "</td><td>". $g["gene_name"] . "</td><td>" . $g["common_name"] . "</td><td>" . $g["accession"] ."</td><td>" . $g["description"] . "</td><td>" . $g["start"] . "</td><td>" . $g["stop"] . "</td><td>"  . $g["strand"] . "</td><td>" . $g["chromosome"] . "</td></tr>";
+        $content .= "    <tr><td>". $g["gene_name"] . "</td><td>" . $g["common_name"] . "</td><td><a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $g["accession"] . "\">" . $g["accession"] ."</a></td><td>" . $g["description"] . "</td><td>" . $g["start"] . "</td><td>" . $g["stop"] . "</td><td>"  . $g["strand"] . "</td><td><a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $g["chromosome"] . "\">" . $g["chromosome"] . "</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -300,11 +300,50 @@ function condition_name_shortcode($attr=[], $content=null)
     if (!$condition_id) return "(no condition provided)";
     $source_url = get_option('source_url', '');
     $cond_json = file_get_contents($source_url . "/api/v1.0.0/condition_info/" . $condition_id);
-    error_log($cond_json);
     $cond = json_decode($cond_json, true)["condition"];
-    error_log('$condition_id: ' . $condition_id . " name: " . $cond["name"]);
+    error_log('$condition_id: ' . $condition_id);
     return $cond["name"];
 }
+
+function condition_blocks_shortcode($attr=[], $content=null)
+{
+    $condition_id = get_query_var('condition');
+    if (!$condition_id) return "(no condition provided)";
+    $source_url = get_option('source_url', '');
+    error_log('$condition_id: ' . $condition_id);
+    $cond_json = file_get_contents($source_url . "/api/v1.0.0/condition_info/" . $condition_id);
+    $cond_blocks = json_decode($cond_json, true)["blocks"];
+    $cond_block_names = array_keys($cond_blocks);
+
+    if ($content == null) {
+        $content = '';
+    }
+
+    $content .= "<div>";
+    $block_num = 0;
+    foreach ($cond_block_names as $b) {
+        $content .= "  <span>" . $b . " <a title=\"click to view conditions\" style=\"text-decoration:none;\" class=\"expand_block_members\" href=\"javascript:void(0)\" id=\"block_" . $block_num . "\">+ </a></span>";
+        $content .= "  <div id=\"block_conds_" . $block_num . "\" style=\"font-size: xx-small; display: none\">";
+        foreach ($cond_blocks[$b] as $sub_cond) {
+            $content .= "<a href=\"../../index.php/condition/?condition=\">" . $sub_cond . "</a> ";
+        }
+        $content .= "  </div>";
+        $block_num++;
+    }
+    $content .= "</div>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('.expand_block_members').click(function() {";
+    $content .= "      var block_conds_id = 'block_conds_' + jQuery(this).attr('id').substring(6);";
+    $content .= "      jQuery('#' + block_conds_id).toggle();";
+    $content .= "      if (jQuery(this).text()[0] == '+') jQuery(this).text('- ');";
+    $content .= "      else jQuery(this).text('+ ');";
+    $content .= "    });";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
 
 function biclusters_table_shortcode($attr=[], $content=null)
 {
@@ -427,6 +466,7 @@ function biclusters_init()
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
     add_shortcode('model_overview', 'model_overview_shortcode');
     add_shortcode('condition_name', 'condition_name_shortcode');
+    add_shortcode('condition_blocks', 'condition_blocks_shortcode');
 
     // EGRIN2 specific
     add_shortcode('corems_table', 'corems_table_shortcode');
