@@ -84,7 +84,7 @@ function bicluster_motifs_shortcode($atts=[], $content=null)
     }
     $source_url = get_option('source_url', '');
     $bicluster_num = get_query_var('bicluster');
-    $motifs_json = file_get_contents($source_url . "/api/v1.0.0/cluster_pssms/" . $bicluster_num);
+    $motifs_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_pssms/" . $bicluster_num);
 
     $content .= "<div id=\"canvas_1\"></div>";
     $content .= "<div id=\"canvas_2\"></div>";
