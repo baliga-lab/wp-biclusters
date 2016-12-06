@@ -15,8 +15,12 @@ function bicluster_genes_shortcode($atts=[], $content=null)
 
     $source_url = get_option('source_url', '');
     $bicluster_num = get_query_var('bicluster');
-    $row_membs_json = file_get_contents($source_url . "/api/v1.0.0/cluster_genes/" . $bicluster_num);
-    $row_membs = json_decode($row_membs_json, true)["genes"];
+    $genes_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_genes/" . $bicluster_num);
+    $genes = json_decode($genes_json, true)["genes"];
+    $row_membs = [];
+    foreach ($genes as $r) {
+        $row_membs[] = $r["gene_name"];
+    }
     $content .= "<ul style=\"font-size: 8pt\">";
     foreach ($row_membs as $m) {
         $content .= "<li>" . $m . "</li>";
@@ -49,11 +53,11 @@ function bicluster_conditions_shortcode($atts=[], $content=null)
 
     $source_url = get_option('source_url', '');
     $bicluster_num = get_query_var('bicluster');
-    $col_membs_json = file_get_contents($source_url . "/api/v1.0.0/cluster_conditions/" . $bicluster_num);
+    $col_membs_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_conditions/" . $bicluster_num);
     $col_membs = json_decode($col_membs_json, true)["conditions"];
     $content .= "<ul style=\"font-size: 8pt\">";
     foreach ($col_membs as $m) {
-        $content .= "<li>" . $m . "</li>";
+        $content .= "<li>" . $m["name"] . "</li>";
     }
     $content .= "</ul>";
     if ($use_microformats) {
