@@ -201,7 +201,7 @@ function genes_table_shortcode($attr=[], $content=null)
     $content .= "  <thead><tr><th>Name</th><th>Common Name</th><th>Accession</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($genes as $g) {
-        $content .= "    <tr><td>". $g["gene_name"] . "</td><td>" . $g["common_name"] . "</td><td><a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $g["accession"] . "\">" . $g["accession"] ."</a></td><td>" . $g["description"] . "</td><td>" . $g["start"] . "</td><td>" . $g["stop"] . "</td><td>"  . $g["strand"] . "</td><td><a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $g["chromosome"] . "\">" . $g["chromosome"] . "</td></tr>";
+        $content .= "    <tr><td><a href=\"index.php/gene/?gene=" . $g["gene_name"] .  "\">". $g["gene_name"] . "</a></td><td>" . $g["common_name"] . "</td><td><a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $g["accession"] . "\">" . $g["accession"] ."</a></td><td>" . $g["description"] . "</td><td>" . $g["start"] . "</td><td>" . $g["stop"] . "</td><td>"  . $g["strand"] . "</td><td><a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $g["chromosome"] . "\">" . $g["chromosome"] . "</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -213,6 +213,27 @@ function genes_table_shortcode($attr=[], $content=null)
     $content .= "</script>";
     return $content;
 }
+
+function gene_info_shortcode($attr=[], $content=null)
+{
+    $gene_name = get_query_var('gene');
+    error_log("gene name: " . $gene_name);
+    if (!$gene_name) return "(no gene name provided)";
+    $source_url = get_option('source_url', '');
+    $gene_json = file_get_contents($source_url . "/api/v1.0.0/gene_info/" . $gene_name);
+    $gene = json_decode($gene_json, true)["gene"];
+    $content = "<div>";
+    $content .= "Name: " . $gene["gene_name"] . "<br>";
+    $content .= "Common Name: " . $gene["common_name"] . "<br>";
+    $content .= "Accession: " . $gene["accession"] . "<br>";
+    $content .= "Description: " . $gene["description"] . "<br>";
+    $content .= "Chromosome: " . $gene["chromosome"] . "<br>";
+    $content .= "Strand: " . $gene["strand"] . "<br>";
+    $content .= "Position: " . $gene["start"] . "-" .  $gene["stop"] . "<br>";
+    $content .= "</div>";
+    return $content;
+}
+
 
 function condition_name_shortcode($attr=[], $content=null)
 {
@@ -264,22 +285,14 @@ function condition_blocks_shortcode($attr=[], $content=null)
     return $content;
 }
 
-
-function biclusters_table_shortcode($attr=[], $content=null)
+function biclusters_table_html($clusters)
 {
-    $source_url = get_option('source_url', '');
-    $clusters_json = file_get_contents($source_url . "/api/v1.0.0/biclusters");
-    $clusters = json_decode($clusters_json, true)["biclusters"];
-
-    if ($content == null) {
-        $content = '';
-    }
-
+    $content = '';
     $content .= "<table id=\"biclusters\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>Bicluster ID</th><th># Genes</th><th># Conditions</th><th>Residual</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($clusters as $c) {
-        $content .= "    <tr><td>" . $c["id"] . "</td><td>". $c["num_genes"] . "</td><td>" . $c["num_conditions"] . "</td><td>" . $c["residual"] . "</td></tr>";
+        $content .= "    <tr><td><a href=\"index.php/bicluster/?bicluster=" . $c["id"] . "\">" . $c["id"] . "</a></td><td>". $c["num_genes"] . "</td><td>" . $c["num_conditions"] . "</td><td>" . $c["residual"] . "</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -292,6 +305,51 @@ function biclusters_table_shortcode($attr=[], $content=null)
     return $content;
 }
 
+function biclusters_table_shortcode($attr=[], $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $clusters_json = file_get_contents($source_url . "/api/v1.0.0/biclusters");
+    $clusters = json_decode($clusters_json, true)["biclusters"];
+
+    return biclusters_table_html($clusters);
+}
+
+function gene_biclusters_table_shortcode($attr=[], $content=null)
+{
+    $gene = get_query_var('gene');
+    $source_url = get_option('source_url', '');
+    $clusters_json = file_get_contents($source_url . "/api/v1.0.0/gene_biclusters/" . $gene);
+    $clusters = json_decode($clusters_json, true)["biclusters"];
+
+    return biclusters_table_html($clusters);
+}
+
+function condition_biclusters_table_shortcode($attr=[], $content=null)
+{
+    $condition_id = get_query_var('condition');
+    $source_url = get_option('source_url', '');
+    $clusters_json = file_get_contents($source_url . "/api/v1.0.0/condition_biclusters/" . $condition_id);
+    $clusters = json_decode($clusters_json, true)["biclusters"];
+
+    return biclusters_table_html($clusters);
+}
+
+function bicluster_info_shortcode($attr=[], $content=null)
+{
+    $bicluster_id = get_query_var('bicluster');
+    if (!$bicluster_id) return "(no bicluster id provided)";
+    $source_url = get_option('source_url', '');
+    $bicluster_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_info/" . $bicluster_id);
+    $bicluster = json_decode($bicluster_json, true)["bicluster"];
+    $content = "<div>";
+    $content .= "ID: " . $bicluster["id"] . "<br>";
+    $content .= "# Conditions: " . $bicluster["num_conditions"] . "<br>";
+    $content .= "# Genes: " . $bicluster["num_genes"] . "<br>";
+    $content .= "Residual: " . $bicluster["residual"] . "<br>";
+    $content .= "</div>";
+    return $content;
+}
+
 function biclusters_add_shortcodes()
 {
     add_shortcode('bicluster_genes', 'bicluster_genes_shortcode');
@@ -300,6 +358,10 @@ function biclusters_add_shortcodes()
     add_shortcode('model_overview', 'model_overview_shortcode');
     add_shortcode('condition_name', 'condition_name_shortcode');
     add_shortcode('condition_blocks', 'condition_blocks_shortcode');
+    add_shortcode('gene_info', 'gene_info_shortcode');
+    add_shortcode('bicluster_info', 'bicluster_info_shortcode');
+    add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
+    add_shortcode('condition_biclusters_table', 'condition_biclusters_table_shortcode');
 
     // EGRIN2 specific
     add_shortcode('corems_table', 'corems_table_shortcode');

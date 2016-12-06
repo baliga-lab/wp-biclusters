@@ -129,29 +129,6 @@ function make_wp_post($posts, $post_name, $post_title, $post_content)
     return $posts;
 }
 
-function biclusters_fakepage_detect($posts)
-{
-    global $wp, $wp_query;
-    $plugin_slug =  get_option('bicluster_slug', 'biclusters');
-    $source_url = get_option('source_url', '');
-
-    $url_comps = explode('/', $wp->request);
-    $lead = $url_comps[0];
-
-    if ($lead == $plugin_slug) {
-        $content_template = get_option('bicluster_info_template');
-        error_log("FAKE PAGE DETECTOR EXECUTED for biclusters plugin");
-        $bicluster_num = get_query_var('bicluster');
-        error_log('bicluster: ' . get_query_var('bicluster'));
-        $posts = make_wp_post($posts, "bicluster", 'Information for Bicluster ' . $bicluster_num, $content_template);
-
-    } else {
-        error_log("FAKE PAGE DETECTOR, unknown request: " . $url_comps[0]);
-    }
-    return $posts;
-}
-
-
 /*
  * Custom variables that are supposed to be used must be made
  * available explicitly through the filter mechanism.
@@ -159,6 +136,7 @@ function biclusters_fakepage_detect($posts)
 function add_query_vars_filter($vars) {
     $vars[] = "bicluster";
     $vars[] = "condition";
+    $vars[] = "gene";
     return $vars;
 }
 
@@ -172,7 +150,7 @@ function biclusters_init()
     wp_enqueue_script('isblogo', plugin_dir_url(__FILE__) . 'js/isblogo.js', array('jquery'));
 
     biclusters_add_shortcodes();
-    add_filter('the_posts', 'biclusters_fakepage_detect');
+    //add_filter('the_posts', 'biclusters_fakepage_detect');
     add_filter('query_vars', 'add_query_vars_filter');
 }
 
