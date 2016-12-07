@@ -147,10 +147,10 @@ function corems_table_shortcode($attr=[], $content=null)
     }
 
     $content .= "<table id=\"corems\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Corem ID</th><th># Genes</th><th># Conditions</th><th>#GREs</th></tr></thead>";
+    $content .= "  <thead><tr><th>Corem ID</th><th># Genes</th><th># Conditions</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($corems as $c) {
-        $content .= "    <tr><td>" . $c["id"] . "</td><td>". $c["num_genes"] . "</td><td>" . $c["num_conds"] . "</td><td>(TODO)</td></tr>";
+        $content .= "    <tr><td><a href=\"index.php/corem/?corem=" . $c["id"] . "\">" . $c["id"] . "</a></td><td>". $c["num_genes"] . "</td><td>" . $c["num_conds"] . "</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -163,21 +163,14 @@ function corems_table_shortcode($attr=[], $content=null)
     return $content;
 }
 
-function conditions_table_shortcode($attr=[], $content=null)
+function conditions_table_html($conditions)
 {
-    $source_url = get_option('source_url', '');
-    $conds_json = file_get_contents($source_url . "/api/v1.0.0/conditions");
-    $conds = json_decode($conds_json, true)["conditions"];
-
-    if ($content == null) {
-        $content = '';
-    }
-
+    $content = '';
     $content .= "<table id=\"conditions\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Condition ID</th><th>Name</th></tr></thead>";
+    $content .= "  <thead><tr><th>Name</th></tr></thead>";
     $content .= "  <tbody>";
-    foreach ($conds as $c) {
-        $content .= "    <tr><td>" . $c["id"] . "</td><td><a href=\"index.php/condition/?condition=" . $c["id"] . "\">". $c["name"] . "</a></td></tr>";
+    foreach ($conditions as $c) {
+        $content .= "    <tr><td><a href=\"index.php/condition/?condition=" . $c["id"] . "\">". $c["name"] . "</a></td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -190,17 +183,28 @@ function conditions_table_shortcode($attr=[], $content=null)
     return $content;
 }
 
-function genes_table_shortcode($attr=[], $content=null)
+function conditions_table_shortcode($attr=[], $content=null)
 {
     $source_url = get_option('source_url', '');
-    $genes_json = file_get_contents($source_url . "/api/v1.0.0/genes");
-    $genes = json_decode($genes_json, true)["genes"];
-    error_log("GENES: " . $genes);
+    $conds_json = file_get_contents($source_url . "/api/v1.0.0/conditions");
+    $conds = json_decode($conds_json, true)["conditions"];
 
-    if ($content == null) {
-        $content = '';
-    }
+    return conditions_table_html($conds);
+}
 
+function corem_conditions_table_shortcode($attr=[], $content=null)
+{
+    $corem_id = get_query_var('corem');
+    $source_url = get_option('source_url', '');
+    $conds_json = file_get_contents($source_url . "/api/v1.0.0/corem_conditions/" . $corem_id);
+    $conds = json_decode($conds_json, true)["conditions"];
+
+    return conditions_table_html($conds);
+}
+
+function genes_table_html($genes)
+{
+    $content = '';
     $content .= "<table id=\"genes\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>Name</th><th>Common Name</th><th>Accession</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
     $content .= "  <tbody>";
@@ -216,6 +220,15 @@ function genes_table_shortcode($attr=[], $content=null)
     $content .= "  });";
     $content .= "</script>";
     return $content;
+}
+
+function genes_table_shortcode($attr=[], $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $genes_json = file_get_contents($source_url . "/api/v1.0.0/genes");
+    $genes = json_decode($genes_json, true)["genes"];
+
+    return genes_table_html($genes);
 }
 
 function gene_info_shortcode($attr=[], $content=null)
@@ -236,6 +249,16 @@ function gene_info_shortcode($attr=[], $content=null)
     $content .= "Position: " . $gene["start"] . "-" .  $gene["stop"] . "<br>";
     $content .= "</div>";
     return $content;
+}
+
+function corem_genes_table_shortcode($attr=[], $content=null)
+{
+    $corem_id = get_query_var('corem');
+    $source_url = get_option('source_url', '');
+    $genes_json = file_get_contents($source_url . "/api/v1.0.0/corem_genes/" . $corem_id);
+    $genes = json_decode($genes_json, true)["genes"];
+
+    return genes_table_html($genes);
 }
 
 
@@ -358,6 +381,10 @@ function biclusters_add_shortcodes()
 {
     add_shortcode('bicluster_genes', 'bicluster_genes_shortcode');
     add_shortcode('bicluster_conditions', 'bicluster_conditions_shortcode');
+
+    add_shortcode('corem_genes_table', 'corem_genes_table_shortcode');
+    add_shortcode('corem_conditions_table', 'corem_conditions_table_shortcode');
+
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
     add_shortcode('model_overview', 'model_overview_shortcode');
     add_shortcode('condition_name', 'condition_name_shortcode');

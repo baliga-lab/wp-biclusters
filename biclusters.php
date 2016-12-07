@@ -137,6 +137,7 @@ function add_query_vars_filter($vars) {
     $vars[] = "bicluster";
     $vars[] = "condition";
     $vars[] = "gene";
+    $vars[] = "corem";
     return $vars;
 }
 
