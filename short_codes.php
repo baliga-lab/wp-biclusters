@@ -16,8 +16,8 @@ function bicluster_genes_shortcode($atts, $content=null)
     $source_url = get_option('source_url', '');
     $bicluster_num = get_query_var('bicluster');
     $genes_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_genes/" . $bicluster_num);
-    $genes = json_decode($genes_json, true)["genes"];
-    $row_membs = [];
+    $genes = json_decode($genes_json, true)->{"genes"};
+    $row_membs = array();
     foreach ($genes as $r) {
         $row_membs[] = $r["gene_name"];
     }
@@ -54,7 +54,7 @@ function bicluster_conditions_shortcode($atts, $content=null)
     $source_url = get_option('source_url', '');
     $bicluster_num = get_query_var('bicluster');
     $col_membs_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_conditions/" . $bicluster_num);
-    $col_membs = json_decode($col_membs_json, true)["conditions"];
+    $col_membs = json_decode($col_membs_json, true)->{"conditions"};
     $content .= "<ul style=\"font-size: 8pt\">";
     foreach ($col_membs as $m) {
         $content .= "<li>" . $m["name"] . "</li>";
@@ -140,7 +140,7 @@ function corems_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $corems_json = file_get_contents($source_url . "/api/v1.0.0/corems");
-    $corems = json_decode($corems_json, true)["corems"];
+    $corems = json_decode($corems_json, true)->{"corems"};
 
     if ($content == null) {
         $content = '';
@@ -187,7 +187,7 @@ function conditions_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $conds_json = file_get_contents($source_url . "/api/v1.0.0/conditions");
-    $conds = json_decode($conds_json, true)["conditions"];
+    $conds = json_decode($conds_json, true)->{"conditions"};
 
     return conditions_table_html($conds);
 }
@@ -197,7 +197,7 @@ function corem_conditions_table_shortcode($attr, $content=null)
     $corem_id = get_query_var('corem');
     $source_url = get_option('source_url', '');
     $conds_json = file_get_contents($source_url . "/api/v1.0.0/corem_conditions/" . $corem_id);
-    $conds = json_decode($conds_json, true)["conditions"];
+    $conds = json_decode($conds_json, true)->{"conditions"};
 
     return conditions_table_html($conds);
 }
@@ -226,7 +226,7 @@ function genes_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $genes_json = file_get_contents($source_url . "/api/v1.0.0/genes");
-    $genes = json_decode($genes_json, true)["genes"];
+    $genes = json_decode($genes_json, true)->{"genes"};
 
     return genes_table_html($genes);
 }
@@ -238,7 +238,7 @@ function gene_info_shortcode($attr, $content=null)
     if (!$gene_name) return "(no gene name provided)";
     $source_url = get_option('source_url', '');
     $gene_json = file_get_contents($source_url . "/api/v1.0.0/gene_info/" . $gene_name);
-    $gene = json_decode($gene_json, true)["gene"];
+    $gene = json_decode($gene_json, true)->{"gene"};
     $content = "<div>";
     $content .= "Name: " . $gene["gene_name"] . "<br>";
     $content .= "Common Name: " . $gene["common_name"] . "<br>";
@@ -256,7 +256,7 @@ function corem_genes_table_shortcode($attr, $content=null)
     $corem_id = get_query_var('corem');
     $source_url = get_option('source_url', '');
     $genes_json = file_get_contents($source_url . "/api/v1.0.0/corem_genes/" . $corem_id);
-    $genes = json_decode($genes_json, true)["genes"];
+    $genes = json_decode($genes_json, true)->{"genes"};
 
     return genes_table_html($genes);
 }
@@ -268,7 +268,7 @@ function condition_name_shortcode($attr, $content=null)
     if (!$condition_id) return "(no condition provided)";
     $source_url = get_option('source_url', '');
     $cond_json = file_get_contents($source_url . "/api/v1.0.0/condition_info/" . $condition_id);
-    $cond = json_decode($cond_json, true)["condition"];
+    $cond = json_decode($cond_json, true)->{"condition"};
     error_log('$condition_id: ' . $condition_id);
     return $cond["name"];
 }
@@ -280,7 +280,7 @@ function condition_blocks_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     error_log('$condition_id: ' . $condition_id);
     $cond_json = file_get_contents($source_url . "/api/v1.0.0/condition_info/" . $condition_id);
-    $cond_blocks = json_decode($cond_json, true)["blocks"];
+    $cond_blocks = json_decode($cond_json, true)->{"blocks"};
     $cond_block_names = array_keys($cond_blocks);
 
     if ($content == null) {
@@ -336,7 +336,7 @@ function biclusters_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $clusters_json = file_get_contents($source_url . "/api/v1.0.0/biclusters");
-    $clusters = json_decode($clusters_json, true)["biclusters"];
+    $clusters = json_decode($clusters_json, true)->{"biclusters"};
 
     return biclusters_table_html($clusters);
 }
@@ -346,7 +346,7 @@ function gene_biclusters_table_shortcode($attr, $content=null)
     $gene = get_query_var('gene');
     $source_url = get_option('source_url', '');
     $clusters_json = file_get_contents($source_url . "/api/v1.0.0/gene_biclusters/" . $gene);
-    $clusters = json_decode($clusters_json, true)["biclusters"];
+    $clusters = json_decode($clusters_json, true)->{"biclusters"};
 
     return biclusters_table_html($clusters);
 }
@@ -356,7 +356,7 @@ function condition_biclusters_table_shortcode($attr, $content=null)
     $condition_id = get_query_var('condition');
     $source_url = get_option('source_url', '');
     $clusters_json = file_get_contents($source_url . "/api/v1.0.0/condition_biclusters/" . $condition_id);
-    $clusters = json_decode($clusters_json, true)["biclusters"];
+    $clusters = json_decode($clusters_json, true)->{"biclusters"};
 
     return biclusters_table_html($clusters);
 }
@@ -367,7 +367,7 @@ function bicluster_info_shortcode($attr, $content=null)
     if (!$bicluster_id) return "(no bicluster id provided)";
     $source_url = get_option('source_url', '');
     $bicluster_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_info/" . $bicluster_id);
-    $bicluster = json_decode($bicluster_json, true)["bicluster"];
+    $bicluster = json_decode($bicluster_json, true)->{"bicluster"};
     $content = "<div>";
     $content .= "ID: " . $bicluster["id"] . "<br>";
     $content .= "# Conditions: " . $bicluster["num_conditions"] . "<br>";
