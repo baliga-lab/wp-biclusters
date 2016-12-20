@@ -5,7 +5,7 @@
  * Render the custom fields by interfacting with the web service
  **********************************************************************/
 
-function bicluster_genes_shortcode($atts=[], $content=null)
+function bicluster_genes_shortcode($atts, $content=null)
 {
     if ($content == null) {
         $content = '';
@@ -43,7 +43,7 @@ function bicluster_genes_shortcode($atts=[], $content=null)
     return $content;
 }
 
-function bicluster_conditions_shortcode($atts=[], $content=null)
+function bicluster_conditions_shortcode($atts, $content=null)
 {
     if ($content == null) {
         $content = '';
@@ -77,7 +77,7 @@ function bicluster_conditions_shortcode($atts=[], $content=null)
     return $content;
 }
 
-function bicluster_motifs_shortcode($atts=[], $content=null)
+function bicluster_motifs_shortcode($atts, $content=null)
 {
     if ($content == null) {
         $content = '';
@@ -104,7 +104,7 @@ function bicluster_motifs_shortcode($atts=[], $content=null)
     return $content;
 }
 
-function model_overview_shortcode($attr=[], $content=null)
+function model_overview_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $summary_json = file_get_contents($source_url . "/api/v1.0.0/summary");
@@ -136,7 +136,7 @@ function model_overview_shortcode($attr=[], $content=null)
     return $content;
 }
 
-function corems_table_shortcode($attr=[], $content=null)
+function corems_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $corems_json = file_get_contents($source_url . "/api/v1.0.0/corems");
@@ -183,7 +183,7 @@ function conditions_table_html($conditions)
     return $content;
 }
 
-function conditions_table_shortcode($attr=[], $content=null)
+function conditions_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $conds_json = file_get_contents($source_url . "/api/v1.0.0/conditions");
@@ -192,7 +192,7 @@ function conditions_table_shortcode($attr=[], $content=null)
     return conditions_table_html($conds);
 }
 
-function corem_conditions_table_shortcode($attr=[], $content=null)
+function corem_conditions_table_shortcode($attr, $content=null)
 {
     $corem_id = get_query_var('corem');
     $source_url = get_option('source_url', '');
@@ -222,7 +222,7 @@ function genes_table_html($genes)
     return $content;
 }
 
-function genes_table_shortcode($attr=[], $content=null)
+function genes_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $genes_json = file_get_contents($source_url . "/api/v1.0.0/genes");
@@ -231,7 +231,7 @@ function genes_table_shortcode($attr=[], $content=null)
     return genes_table_html($genes);
 }
 
-function gene_info_shortcode($attr=[], $content=null)
+function gene_info_shortcode($attr, $content=null)
 {
     $gene_name = get_query_var('gene');
     error_log("gene name: " . $gene_name);
@@ -251,7 +251,7 @@ function gene_info_shortcode($attr=[], $content=null)
     return $content;
 }
 
-function corem_genes_table_shortcode($attr=[], $content=null)
+function corem_genes_table_shortcode($attr, $content=null)
 {
     $corem_id = get_query_var('corem');
     $source_url = get_option('source_url', '');
@@ -262,7 +262,7 @@ function corem_genes_table_shortcode($attr=[], $content=null)
 }
 
 
-function condition_name_shortcode($attr=[], $content=null)
+function condition_name_shortcode($attr, $content=null)
 {
     $condition_id = get_query_var('condition');
     if (!$condition_id) return "(no condition provided)";
@@ -273,7 +273,7 @@ function condition_name_shortcode($attr=[], $content=null)
     return $cond["name"];
 }
 
-function condition_blocks_shortcode($attr=[], $content=null)
+function condition_blocks_shortcode($attr, $content=null)
 {
     $condition_id = get_query_var('condition');
     if (!$condition_id) return "(no condition provided)";
@@ -332,7 +332,7 @@ function biclusters_table_html($clusters)
     return $content;
 }
 
-function biclusters_table_shortcode($attr=[], $content=null)
+function biclusters_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $clusters_json = file_get_contents($source_url . "/api/v1.0.0/biclusters");
@@ -341,7 +341,7 @@ function biclusters_table_shortcode($attr=[], $content=null)
     return biclusters_table_html($clusters);
 }
 
-function gene_biclusters_table_shortcode($attr=[], $content=null)
+function gene_biclusters_table_shortcode($attr, $content=null)
 {
     $gene = get_query_var('gene');
     $source_url = get_option('source_url', '');
@@ -351,7 +351,7 @@ function gene_biclusters_table_shortcode($attr=[], $content=null)
     return biclusters_table_html($clusters);
 }
 
-function condition_biclusters_table_shortcode($attr=[], $content=null)
+function condition_biclusters_table_shortcode($attr, $content=null)
 {
     $condition_id = get_query_var('condition');
     $source_url = get_option('source_url', '');
@@ -361,7 +361,7 @@ function condition_biclusters_table_shortcode($attr=[], $content=null)
     return biclusters_table_html($clusters);
 }
 
-function bicluster_info_shortcode($attr=[], $content=null)
+function bicluster_info_shortcode($attr, $content=null)
 {
     $bicluster_id = get_query_var('bicluster');
     if (!$bicluster_id) return "(no bicluster id provided)";
