@@ -140,7 +140,7 @@ function corems_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $corems_json = file_get_contents($source_url . "/api/v1.0.0/corems");
-    $corems = json_decode($corems_json, true)->{"corems"};
+    $corems = json_decode($corems_json)->corems;
 
     if ($content == null) {
         $content = '';
@@ -150,7 +150,7 @@ function corems_table_shortcode($attr, $content=null)
     $content .= "  <thead><tr><th>Corem ID</th><th># Genes</th><th># Conditions</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($corems as $c) {
-        $content .= "    <tr><td><a href=\"index.php/corem/?corem=" . $c["id"] . "\">" . $c["id"] . "</a></td><td>". $c["num_genes"] . "</td><td>" . $c["num_conds"] . "</td></tr>";
+        $content .= "    <tr><td><a href=\"index.php/corem/?corem=" . $c->id . "\">" . $c->id . "</a></td><td>". $c->num_genes . "</td><td>" . $c->num_conds . "</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
