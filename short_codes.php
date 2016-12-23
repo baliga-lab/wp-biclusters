@@ -236,16 +236,6 @@ function genes_table_shortcode($attr, $content)
     return $content;
 }
 
-/*
-function genes_table_shortcode($attr, $content=null)
-{
-    $source_url = get_option('source_url', '');
-    $genes_json = file_get_contents($source_url . "/api/v1.0.0/genes");
-    $genes = json_decode($genes_json)->genes;
-
-    return genes_table_html($genes);
-    }*/
-
 function gene_info_shortcode($attr, $content=null)
 {
     $gene_name = get_query_var('gene');
@@ -337,13 +327,34 @@ function biclusters_table_html($clusters)
     return $content;
 }
 
-function biclusters_table_shortcode($attr, $content=null)
-{
-    $source_url = get_option('source_url', '');
-    $clusters_json = file_get_contents($source_url . "/api/v1.0.0/biclusters");
-    $clusters = json_decode($clusters_json)->biclusters;
 
-    return biclusters_table_html($clusters);
+function biclusters_table_shortcode($attr, $content)
+{
+    $content = "<table id=\"biclusters\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>Bicluster ID</th><th># Genes</th><th># Conditions</th><th>Residual</th></tr></thead>";
+    $content .= "  <tbody>";
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {\n";
+    $content .= "    jQuery('#biclusters').DataTable({\n";
+    $content .= "      'processing': true,\n";
+    $content .= "      'serverSide': true,\n";
+    $content .= "      'columns': [\n";
+    $content .= "        {'data': 'id'},\n";
+    $content .= "        {'data': 'num_genes'},\n";
+    $content .= "        {'data': 'num_conditions'},\n";
+    $content .= "        {'data': 'residual'}\n";
+    $content .= "      ],\n";
+    $content .= "      'ajax': {\n";
+    $content .= "         'url': ajax_dt.ajax_url,\n";
+    $content .= "         'type': 'GET',\n";
+    $content .= "         'data': {'action': 'biclusters_dt'}\n";
+    $content .= "     }\n";
+    $content .= "    });\n";
+    $content .= "  });\n";
+    $content .= "</script>";
+    return $content;
 }
 
 function gene_biclusters_table_shortcode($attr, $content=null)
