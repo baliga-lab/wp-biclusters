@@ -36,17 +36,6 @@ function biclusters_settings_init() {
 
     register_setting('general', 'source_url');
     register_setting('general', 'bicluster_slug');
-
-    // This is the writing section
-    add_settings_section(
-        "writing_section",
-        "Biclusters",
-        "writing_section_cb",
-        'writing'
-    );
-    add_settings_field('bicluster_info_template', 'Template for Bicluster Pages', 'info_template_field_cb', 'writing',
-                       'writing_section');
-    register_setting('writing', 'bicluster_info_template');
 }
 
 function general_section_cb()
@@ -66,68 +55,11 @@ function slug_field_cb()
     echo "<input type=\"text\" name=\"bicluster_slug\" value=\"" . $slug . "\">";
 }
 
-function writing_section_cb()
-{
-    echo "<p>General settings for the Biclusters Plugin</p>";
-}
-
-function info_template_field_cb()
-{
-    $info_template = get_option('bicluster_info_template', 'This is a test');
-    echo "<textarea rows=\"3\" cols=\"80\" name=\"bicluster_info_template\">" . $info_template . "</textarea>";
-}
-
 /**********************************************************************
  * Plugin Section
  **********************************************************************/
 
 require_once('short_codes.php');
-
-/**********************************************************************
- * Custom post type (TODO)
- * We can define custom bicluster pages using a custom post type
- **********************************************************************/
-
-/**********************************************************************
- * Fake page
- * We define a fake page for the bicluster slug, in order to
- * avoid that the user has to create many real pages for each cluster
- * To executed: the URL needs to have "<prefix>/index.php/biclusters"
- * TODO: can we have user-defined page templates for bicluster info pages ?
- * Example URL: http://localhost/~weiju/wordpress/index.php/bicluster/?bicluster=23
- **********************************************************************/
-
-function make_wp_post($posts, $post_name, $post_title, $post_content)
-{
-    global $wp_query;
-    $post = new stdClass;
-    $post->post_author = 1;
-    $post->post_name = $post_name;
-    $post->post_title = $post_title;
-    $post->post_content = $post_content;
-    $post->ID = -999;
-    $post->post_type = 'page';
-    $post->post_status = 'status';
-    $post->comment_status = 'closed';
-    $post->ping_status = 'open';
-    $post->comment_count = 0;
-    $post->post_date = current_time('mysql');
-    $post->post_date_gmt = current_time('mysql', 1);
-
-    $posts = NULL;
-    $posts[] = $post;
-
-    // information to wp_query
-    $wp_query->is_page = true;
-    $wp_query->is_singular = true;
-    $wp_query->is_home = false;
-    $wp_query->is_archive = false;
-    $wp_query->is_category = false;
-    unset($wp_query->query['error']);
-    $wp_query->query_vars['error'] = '';
-    $wp_query->is_404 = false;
-    return $posts;
-}
 
 /*
  * Custom variables that are supposed to be used must be made
@@ -148,14 +80,66 @@ function biclusters_init()
     wp_enqueue_style('wp-biclusters', plugin_dir_url(__FILE__) . 'css/wp-biclusters.css');
 
     wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'));
+    // for debugging only
+    //wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.js', array('jquery'));
     wp_enqueue_script('isblogo', plugin_dir_url(__FILE__) . 'js/isblogo.js', array('jquery'));
 
+    // a hook Javascript to anchor our AJAX call
+    wp_enqueue_script('ajax_dt', plugins_url('js/ajax_dt.js', __FILE__), array('jquery'));
+    wp_localize_script('ajax_dt', 'ajax_dt', array('ajax_url' => admin_url('admin-ajax.php')), '1.0', true);
+
     biclusters_add_shortcodes();
-    //add_filter('the_posts', 'biclusters_fakepage_detect');
     add_filter('query_vars', 'add_query_vars_filter');
+}
+
+/**
+ * Datatables backend for genes. This is called via AJAX.
+ */
+function genes_dt_callback() {
+    header("Content-type: application/json");
+    $draw = intval($_GET['draw']);  // integer
+    $start = $_GET['start'];  // integer
+    $length = $_GET['length'];  // integer
+
+    $source_url = get_option('source_url', '');
+    $genes_json = file_get_contents($source_url . "/api/v1.0.0/genes?start=" . $start . "&length=" . $length);
+    $genes = json_decode($genes_json)->genes;
+
+    // turn gene_name, accession and chromosome into links before sending them to DataTables
+    foreach ($genes as $g) {
+        $chrom = $g->chromosome;
+        $acc = $g->accession;
+        $name = $g->gene_name;
+
+        $g->gene_name = "<a href=\"index.php/gene/?gene=" . $name . "\">" . $name . "</a>";
+        $g->chromosome = "<a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $chrom . "\">" . $chrom . "</a>";
+        $g->accession = "<a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">" . $acc . "</a>";
+    }
+    $data = json_encode($genes);
+    $summary_json = file_get_contents($source_url . "/api/v1.0.0/summary");
+    $summary = json_decode($summary_json);
+
+    error_log("start: " . $start . " length: " . $length);
+    $records_total = $summary->num_genes;
+
+    $doc = <<<EOT
+{
+  "draw": $draw,
+  "recordsTotal": $records_total,
+  "recordsFiltered": $records_total,
+  "data": $data
+}
+EOT;
+    #echo "{\"Hello\": \"World\", \"draw\": \"" . $draw . "\"}";
+    echo $doc;
+    wp_die();
 }
 
 add_action('admin_init', 'biclusters_settings_init');
 add_action('init', 'biclusters_init');
+
+// We need callbacks for both non-privileged and privileged users
+add_action('wp_ajax_nopriv_genes_dt', 'genes_dt_callback');
+add_action('wp_ajax_genes_dt', 'genes_dt_callback');
 
 ?>

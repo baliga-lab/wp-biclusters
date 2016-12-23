@@ -109,9 +109,13 @@ function model_overview_shortcode($attr, $content=null)
     $content .= "</table>";
     $content .= "<script>";
     $content .= "  jQuery(document).ready(function() {";
+
+    $content .= "\n    var data = {'action': 'genes_dt', 'draw': 1234, 'start': 0, 'length': 2};\n";
+    $content .= "    jQuery.ajax({url: ajax_dt.ajax_url, type: 'get', data: data, success: function(response) { console.debug(response); } });\n";
+
     $content .= "    jQuery('#summary').DataTable({";
     $content .= "      'paging': false,";
-    $content .= "      'info': false";
+    $content .= "      'info': false,";
     $content .= "      'searching': false";
     $content .= "    })";
     $content .= "  });";
@@ -199,6 +203,40 @@ function genes_table_html($genes)
     return $content;
 }
 
+function genes_table_shortcode($attr, $content)
+{
+    $content = "<table id=\"genes\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>Name</th><th>Common Name</th><th>Accession</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
+    $content .= "  <tbody>";
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {\n";
+    $content .= "    jQuery('#genes').DataTable({\n";
+    $content .= "      'processing': true,\n";
+    $content .= "      'serverSide': true,\n";
+    $content .= "      'columns': [\n";
+    $content .= "        {'data': 'gene_name'},\n";
+    $content .= "        {'data': 'common_name'},\n";
+    $content .= "        {'data': 'accession'},\n";
+    $content .= "        {'data': 'description'},\n";
+    $content .= "        {'data': 'start'},\n";
+    $content .= "        {'data': 'stop'},\n";
+    $content .= "        {'data': 'strand'},\n";
+    $content .= "        {'data': 'chromosome'}\n";
+    $content .= "      ],\n";
+    $content .= "      'ajax': {\n";
+    $content .= "         'url': ajax_dt.ajax_url,\n";
+    $content .= "         'type': 'GET',\n";
+    $content .= "         'data': {'action': 'genes_dt'}\n";
+    $content .= "     }\n";
+    $content .= "    });\n";
+    $content .= "  });\n";
+    $content .= "</script>";
+    return $content;
+}
+
+/*
 function genes_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
@@ -206,12 +244,11 @@ function genes_table_shortcode($attr, $content=null)
     $genes = json_decode($genes_json)->genes;
 
     return genes_table_html($genes);
-}
+    }*/
 
 function gene_info_shortcode($attr, $content=null)
 {
     $gene_name = get_query_var('gene');
-    error_log("gene name: " . $gene_name);
     if (!$gene_name) return "(no gene name provided)";
     $source_url = get_option('source_url', '');
     $gene_json = file_get_contents($source_url . "/api/v1.0.0/gene_info/" . $gene_name);
