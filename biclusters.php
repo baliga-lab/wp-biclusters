@@ -79,11 +79,13 @@ function biclusters_init()
     // add all javascript and style files that are used by our plugin
     wp_enqueue_style('datatables', plugin_dir_url(__FILE__) . 'css/jquery.dataTables.min.css');
     wp_enqueue_style('wp-biclusters', plugin_dir_url(__FILE__) . 'css/wp-biclusters.css');
+    wp_enqueue_style('qtip', plugin_dir_url(__FILE__) . 'css/jquery.qtip.min.css', null, false, false);
 
     wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'));
     // for debugging only
     //wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.js', array('jquery'));
     wp_enqueue_script('isblogo', plugin_dir_url(__FILE__) . 'js/isblogo.js', array('jquery'));
+    wp_enqueue_script('qtip', plugin_dir_url(__FILE__) . 'js/jquery.qtip.min.js', array('jquery'), false, true);
 
     biclusters_add_shortcodes();
     biclusters_datatables_source_init();

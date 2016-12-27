@@ -102,22 +102,22 @@ function model_overview_shortcode($attr, $content=null)
     $content .= "  <tbody>";
     $content .= "    <tr><td><a href=\"index.php/genes/\">" . $summary->num_genes . "</a></td><td>Genes</td></tr>";
     $content .= "    <tr><td><a href=\"index.php/conditions/\">" . $summary->num_conditions . "</a></td><td>Conditions</td></tr>";
-    $content .= "    <tr><td><a href=\"index.php/corems/\">" . $summary->num_corems . "</a></td><td>Corems</td></tr>";
-    $content .= "    <tr><td><a href=\"index.php/biclusters/\">" . $summary->num_biclusters . "</a></td><td>Biclusters</td></tr>";
-    $content .= "    <tr><td>" . $summary->num_gres . "</td><td>GREs</td></tr>";
+    $content .= "    <tr><td><a href=\"index.php/corems/\">" . $summary->num_corems . "</a></td><td>Corems <img id=\"corem_help\" style=\"width: 18px\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></td></tr>";
+    $content .= "    <tr><td><a href=\"index.php/biclusters/\">" . $summary->num_biclusters . "</a></td><td>Biclusters <img id=\"bicluster_help\" style=\"width: 18px\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></td></tr>";
+    $content .= "    <tr><td>" . $summary->num_gres . "</td><td>GREs <img id=\"gre_help\" style=\"width: 18px\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></td></tr>";
     $content .= "  </tbody>";
     $content .= "</table>";
     $content .= "<script>";
     $content .= "  jQuery(document).ready(function() {";
 
-    $content .= "\n    var data = {'action': 'genes_dt', 'draw': 1234, 'start': 0, 'length': 2};\n";
-    $content .= "    jQuery.ajax({url: ajax_dt.ajax_url, type: 'get', data: data, success: function(response) { console.debug(response); } });\n";
-
     $content .= "    jQuery('#summary').DataTable({";
     $content .= "      'paging': false,";
     $content .= "      'info': false,";
     $content .= "      'searching': false";
-    $content .= "    })";
+    $content .= "    });";
+    $content .= "    jQuery('#bicluster_help').qtip({ content: 'Bicluster: Output of integrated biclustering algorithm, cMonkey (Reiss et al., 2006), that identifies groups of genes with (1) similar patterns of differential expression over subsets of conditions, (2) similar de novo detected <i>cis</i>-regulatory motifs in their promoters, and (3) related functions, inferred from functional association networks (e.g., EMBL STRING (Szklarczyk et al., 2011)).' });";
+    $content .= "    jQuery('#corem_help').qtip({ content: 'A <strong>corem</strong> or <i>conditionally co-regulated module</i> is a set of genes that are <strong>co-regulated</strong> in <strong>specific environments</strong>. Often (but not always) genes in a corem share common regulatory mechanisms (<i>GREs</i>). A gene can belong to multiple corems. Corems were discovered by applying <strong>EGRIN 2.0</strong> to large gene expression data sets.' });";
+    $content .= "    jQuery('#gre_help').qtip({ content: 'GRE: Gene Regulatory Element, a cluster of similar <i>cis</i>-regulatory motifs' });";
     $content .= "  });";
     $content .= "</script>";
     return $content;
