@@ -363,8 +363,8 @@ function gene_biclusters_table_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     $clusters_json = file_get_contents($source_url . "/api/v1.0.0/gene_biclusters/" . $gene);
     $clusters = json_decode($clusters_json)->biclusters;
-
-    return biclusters_table_html($clusters);
+    $content = "<h3>Contained in " . count($clusters) . " biclusters</h3>";
+    return $content . biclusters_table_html($clusters);
 }
 
 function condition_biclusters_table_shortcode($attr, $content=null)
