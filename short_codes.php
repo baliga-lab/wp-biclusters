@@ -293,6 +293,24 @@ function corem_coexpressions_graph_shortcode($attr, $content)
     return $content;
 }
 
+function corem_condition_blocks_shortcode($attr, $content)
+{
+    $corem_id = get_query_var('corem');
+    if (!$corem_id) return "(no corem provided)";
+    $source_url = get_option('source_url', '');
+    $blocks_json = file_get_contents($source_url . "/api/v1.0.0/corem_condition_enrichment/" . $corem_id);
+    $blocks = json_decode($blocks_json)->condition_blocks;
+
+    $content = '<div>';
+    $block_num = 1;
+    foreach ($blocks as $b) {
+        $content .= "  <div>" . $block_num . ". " . $b->name . " (q-value: " . $b->q_value.  ")</div>";
+        $block_num++;
+    }
+    $content .= '</div>';
+    return $content;
+}
+
 
 function condition_name_shortcode($attr, $content=null)
 {
@@ -429,6 +447,7 @@ function biclusters_add_shortcodes()
     add_shortcode('corem_genes_table', 'corem_genes_table_shortcode');
     add_shortcode('corem_conditions_table', 'corem_conditions_table_shortcode');
     add_shortcode('corem_coexpressions_graph', 'corem_coexpressions_graph_shortcode');
+    add_shortcode('corem_condition_blocks', 'corem_condition_blocks_shortcode');
 
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
     add_shortcode('model_overview', 'model_overview_shortcode');
