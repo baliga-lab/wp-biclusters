@@ -265,6 +265,34 @@ function corem_genes_table_shortcode($attr, $content=null)
     return genes_table_html($genes);
 }
 
+function corem_coexpressions_graph_shortcode($attr, $content)
+{
+    $corem_id = get_query_var('corem');
+    $content = '<div id="corem_coexps" style="width: 100%; height: 300px"></div>';
+    $content .= "<script>\n";
+    $content .= "    function makeCoCoExpChart(data, conds) {";
+    $content .= "      var chart = Highcharts.chart('corem_coexps', {\n";
+    $content .= "        chart: { type: 'line' },";
+    $content .= "        title: { text: 'Co-expression' },\n";
+    $content .= "        xAxis: { categories: conds },\n";
+    $content .= "        yAxis: { title: { text: 'Standardized expression'} },\n";
+    $content .= "        series: data\n";
+    $content .= "     })\n";
+    $content .= "   }\n";
+
+    $content .= "  jQuery(document).ready(function() {\n";
+    $content .= "    jQuery.ajax({\n";
+    $content .= "      url: ajax_dt.ajax_url,\n";
+    $content .= "      method: 'GET',\n";
+    $content .= "      data: {'action': 'corem_coexps_dt', 'corem': " . $corem_id ."}\n";
+    $content .= "    }).done(function(data) {\n";
+    $content .= "      makeCoCoExpChart(data.expressions, data.conditions);\n";
+    $content .= "    });\n";
+    $content .= "  });\n";
+    $content .= "</script>\n";
+    return $content;
+}
+
 
 function condition_name_shortcode($attr, $content=null)
 {
@@ -400,6 +428,7 @@ function biclusters_add_shortcodes()
 
     add_shortcode('corem_genes_table', 'corem_genes_table_shortcode');
     add_shortcode('corem_conditions_table', 'corem_conditions_table_shortcode');
+    add_shortcode('corem_coexpressions_graph', 'corem_coexpressions_graph_shortcode');
 
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
     add_shortcode('model_overview', 'model_overview_shortcode');

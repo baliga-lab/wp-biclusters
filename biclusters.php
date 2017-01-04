@@ -60,7 +60,7 @@ function slug_field_cb()
  **********************************************************************/
 
 require_once('short_codes.php');
-require_once('datatable_source.php');
+require_once('ajax_source.php');
 
 /*
  * Custom variables that are supposed to be used must be made
@@ -86,6 +86,7 @@ function biclusters_init()
     //wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.js', array('jquery'));
     wp_enqueue_script('isblogo', plugin_dir_url(__FILE__) . 'js/isblogo.js', array('jquery'));
     wp_enqueue_script('qtip', plugin_dir_url(__FILE__) . 'js/jquery.qtip.min.js', array('jquery'), false, true);
+    wp_enqueue_script('highcharts', plugin_dir_url(__FILE__) . 'js/highcharts.js', array('jquery'));
 
     biclusters_add_shortcodes();
     biclusters_datatables_source_init();

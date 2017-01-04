@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Datatables backend for genes. This is called via AJAX.
+ * AJAX backend.
  */
 
 function genes_dt_callback() {
@@ -21,6 +21,8 @@ function genes_dt_callback() {
         $name = $g->gene_name;
 
         $g->gene_name = "<a href=\"index.php/gene/?gene=" . $name . "\">" . $name . "</a>";
+        // TODO: Tuberculist: http://tuberculist.epfl.ch/quicksearch.php?gene+name=Rv0005
+        // TODO: PATRIC
         $g->chromosome = "<a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $chrom . "\">" . $chrom . "</a>";
         $g->accession = "<a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">" . $acc . "</a>";
     }
@@ -77,6 +79,30 @@ EOT;
     wp_die();
 }
 
+function corem_coexps_dt_callback() {
+    header("Content-type: application/json");
+    $corem = $_GET['corem'];  // integer
+
+    $source_url = get_option('source_url', '');
+    $exps_json = file_get_contents($source_url . "/api/v1.0.0/corem_expressions/" . $corem);
+    $exps = json_decode($exps_json);
+    $conditions = json_encode($exps->conditions);
+    $expdata = array();
+    foreach ($exps->expressions as $gene => $values) {
+        $expdata []= (object) array('name' => $gene, 'data' => $values);
+    }
+    $data = json_encode($expdata);
+
+    $doc = <<<EOT
+{
+  "conditions": $conditions,
+  "expressions": $data
+}
+EOT;
+    echo $doc;
+    wp_die();
+}
+
 function biclusters_datatables_source_init()
 {
     // a hook Javascript to anchor our AJAX call
@@ -88,6 +114,7 @@ function biclusters_datatables_source_init()
     add_action('wp_ajax_genes_dt', 'genes_dt_callback');
     add_action('wp_ajax_nopriv_biclusters_dt', 'biclusters_dt_callback');
     add_action('wp_ajax_biclusters_dt', 'biclusters_dt_callback');
+    add_action('wp_ajax_corem_coexps_dt', 'corem_coexps_dt_callback');
 }
 
 ?>
