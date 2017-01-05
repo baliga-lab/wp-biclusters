@@ -311,6 +311,23 @@ function corem_condition_blocks_shortcode($attr, $content)
     return $content;
 }
 
+function corem_gres_shortcode($attr, $content)
+{
+    $corem_id = get_query_var('corem');
+    if (!$corem_id) return "(no corem provided)";
+    $source_url = get_option('source_url', '');
+    $gres_json = file_get_contents($source_url . "/api/v1.0.0/corem_gres/" . $corem_id);
+    $gres = json_decode($gres_json)->gres;
+
+    $content = '<div>';
+    foreach ($gres as $g) {
+        $content .= '<div>GRE: ' . $g->gre . ' q-value: ' . $g->q_value .'</div>';
+        $content .= '<div>[Motif placeholder]</div>';
+    }
+    $content .= '</div>';
+    return $content;
+}
+
 
 function condition_name_shortcode($attr, $content=null)
 {
@@ -448,6 +465,7 @@ function biclusters_add_shortcodes()
     add_shortcode('corem_conditions_table', 'corem_conditions_table_shortcode');
     add_shortcode('corem_coexpressions_graph', 'corem_coexpressions_graph_shortcode');
     add_shortcode('corem_condition_blocks', 'corem_condition_blocks_shortcode');
+    add_shortcode('corem_gres', 'corem_gres_shortcode');
 
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
     add_shortcode('model_overview', 'model_overview_shortcode');
