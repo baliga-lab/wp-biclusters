@@ -274,7 +274,7 @@ function corem_coexpressions_graph_shortcode($attr, $content)
     $content .= "      var chart = Highcharts.chart('corem_coexps', {\n";
     $content .= "        chart: { type: 'line' },";
     $content .= "        title: { text: 'Co-expression' },\n";
-    $content .= "        xAxis: { categories: conds },\n";
+    $content .= "        xAxis: { title: { text: 'Conditions' } },\n";
     $content .= "        yAxis: { title: { text: 'Standardized expression'} },\n";
     $content .= "        series: data\n";
     $content .= "     })\n";
