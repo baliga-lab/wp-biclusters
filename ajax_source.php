@@ -114,6 +114,7 @@ function biclusters_datatables_source_init()
     add_action('wp_ajax_genes_dt', 'genes_dt_callback');
     add_action('wp_ajax_nopriv_biclusters_dt', 'biclusters_dt_callback');
     add_action('wp_ajax_biclusters_dt', 'biclusters_dt_callback');
+    add_action('wp_ajax_nopriv_corem_coexps_dt', 'corem_coexps_dt_callback');
     add_action('wp_ajax_corem_coexps_dt', 'corem_coexps_dt_callback');
 }
 
