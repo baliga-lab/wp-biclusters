@@ -271,10 +271,14 @@ function corem_coexpressions_graph_shortcode($attr, $content)
     $content = '<div id="corem_coexps" style="width: 100%; height: 300px"></div>';
     $content .= "<script>\n";
     $content .= "    function makeCoCoExpChart(data, conds) {";
-    $content .= "      var chart = Highcharts.chart('corem_coexps', {\n";
+    $content .= "      var x, chart = Highcharts.chart('corem_coexps', {\n";
     $content .= "        chart: { type: 'line' },";
     $content .= "        title: { text: 'Co-expression' },\n";
-    $content .= "        xAxis: { title: { text: 'Conditions' } },\n";
+    $content .= "        xAxis: { title: { text: 'Conditions' }, categories: conds,\n";
+    $content .= "                 labels: {\n";
+    $content .= "                   formatter: function() {\n";
+    $content .= "                     return this.axis.categories.indexOf(this.value);\n";
+    $content .= "                   }}},\n";
     $content .= "        yAxis: { title: { text: 'Standardized expression'} },\n";
     $content .= "        series: data\n";
     $content .= "     })\n";
