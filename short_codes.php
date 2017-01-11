@@ -436,6 +436,39 @@ function gene_biclusters_table_shortcode($attr, $content=null)
     return $content . biclusters_table_html($clusters);
 }
 
+function corems_table_html($corems)
+{
+    $content = "<table id=\"corems\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>Corem ID</th><th># Genes</th></tr></thead>";
+    $content .= "  <tbody>";
+    foreach ($corems as $c) {
+        $content .= "    <tr><td><a href=\"index.php/corem/?corem=" . $c->id . "\">" . $c->id . "</a></td><td>". count($c->genes) . "</td></tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#corems').DataTable({";
+    $content .= "    })";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+function gene_corems_table_shortcode($attr, $content=null)
+{
+    $gene = get_query_var('gene');
+    $source_url = get_option('source_url', '');
+    $corems_json = file_get_contents($source_url . "/api/v1.0.0/corems_with_gene/" . $gene);
+    $corems = json_decode($corems_json)->corem_infos;
+    $content = "<h3>Contained in " . count($corems) . " corems</h3>";
+    if (count($corems) > 0) {
+        return $content . corems_table_html($corems);
+    } else {
+        return $content;
+    }
+}
+
 function condition_biclusters_table_shortcode($attr, $content=null)
 {
     $condition_id = get_query_var('condition');
@@ -473,13 +506,15 @@ function biclusters_add_shortcodes()
     add_shortcode('corem_condition_blocks', 'corem_condition_blocks_shortcode');
     add_shortcode('corem_gres', 'corem_gres_shortcode');
 
+    add_shortcode('gene_info', 'gene_info_shortcode');
+    add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
+    add_shortcode('gene_corems_table', 'gene_corems_table_shortcode');
+
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
     add_shortcode('model_overview', 'model_overview_shortcode');
     add_shortcode('condition_name', 'condition_name_shortcode');
     add_shortcode('condition_blocks', 'condition_blocks_shortcode');
-    add_shortcode('gene_info', 'gene_info_shortcode');
     add_shortcode('bicluster_info', 'bicluster_info_shortcode');
-    add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
     add_shortcode('condition_biclusters_table', 'condition_biclusters_table_shortcode');
 
     // EGRIN2 specific
