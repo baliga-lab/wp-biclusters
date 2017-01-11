@@ -268,7 +268,8 @@ function corem_genes_table_shortcode($attr, $content=null)
 function corem_coexpressions_graph_shortcode($attr, $content)
 {
     $corem_id = get_query_var('corem');
-    $content = '<div id="corem_coexps" style="width: 100%; height: 300px"></div>';
+    $content = "<div style=\"width: 100%;\"><img id=\"coexp_help\" style=\"width: 18px; float: right\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></div>\n";
+    $content .= '<div id="corem_coexps" style="width: 100%; height: 300px"></div>';
     $content .= "<script>\n";
     $content .= "    function makeCoCoExpChart(data, conds) {";
     $content .= "      var x, chart = Highcharts.chart('corem_coexps', {\n";
@@ -285,6 +286,7 @@ function corem_coexpressions_graph_shortcode($attr, $content)
     $content .= "   }\n";
 
     $content .= "  jQuery(document).ready(function() {\n";
+    $content .= "    jQuery('#coexp_help').qtip({ content: 'Hover over data points to see condition and value information' });";
     $content .= "    jQuery.ajax({\n";
     $content .= "      url: ajax_dt.ajax_url,\n";
     $content .= "      method: 'GET',\n";
