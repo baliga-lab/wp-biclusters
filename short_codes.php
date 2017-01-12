@@ -184,6 +184,35 @@ function corem_conditions_table_shortcode($attr, $content=null)
     return conditions_table_html($conds);
 }
 
+function categories_table_html($categories)
+{
+    $content = "<table id=\"categories\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>Name</th><th>p.adj</th></tr></thead>";
+    $content .= "  <tbody>";
+    foreach ($categories as $c) {
+        $content .= "    <tr><td>" . $c->category . "</td><td>" . $c->p_adj . "</td></tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#categories').DataTable({";
+    $content .= "    })";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+function corem_categories_table_shortcode($attr, $content=null)
+{
+    $corem_id = get_query_var('corem');
+    $source_url = get_option('source_url', '');
+    $cats_json = file_get_contents($source_url . "/api/v1.0.0/corem_categories/" . $corem_id);
+    $cats = json_decode($cats_json)->categories;
+
+    return categories_table_html($cats);
+}
+
 function genes_table_html($genes)
 {
     $content = "<table id=\"genes\" class=\"stripe row-border\">";
@@ -503,6 +532,7 @@ function biclusters_add_shortcodes()
 
     add_shortcode('corem_genes_table', 'corem_genes_table_shortcode');
     add_shortcode('corem_conditions_table', 'corem_conditions_table_shortcode');
+    add_shortcode('corem_categories_table', 'corem_categories_table_shortcode');
     add_shortcode('corem_coexpressions_graph', 'corem_coexpressions_graph_shortcode');
     add_shortcode('corem_condition_blocks', 'corem_condition_blocks_shortcode');
     add_shortcode('corem_gres', 'corem_gres_shortcode');
