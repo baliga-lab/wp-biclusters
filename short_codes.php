@@ -307,7 +307,8 @@ function corem_condition_blocks_shortcode($attr, $content)
     $blocks_json = file_get_contents($source_url . "/api/v1.0.0/corem_condition_enrichment/" . $corem_id);
     $blocks = json_decode($blocks_json)->condition_blocks;
 
-    $content = '<div>';
+    $content = "<h4>Enriched in " . count($blocks) . " Condition Blocks</h4>";
+    $content .= '<div>';
     $block_num = 1;
     foreach ($blocks as $b) {
         $content .= "  <div>" . $block_num . ". " . $b->name . " (q-value: " . $b->q_value.  ")</div>";
