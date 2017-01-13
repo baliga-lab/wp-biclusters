@@ -235,7 +235,7 @@ function genes_table_html($genes)
 function genes_table_shortcode($attr, $content)
 {
     $content = "<table id=\"genes\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Name</th><th>Common Name</th><th>Accession</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
+    $content .= "  <thead><tr><th>Name</th><th>Common Name</th><th>Links</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
     $content .= "  <tbody>";
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -247,7 +247,7 @@ function genes_table_shortcode($attr, $content)
     $content .= "      'columns': [\n";
     $content .= "        {'data': 'gene_name'},\n";
     $content .= "        {'data': 'common_name'},\n";
-    $content .= "        {'data': 'accession'},\n";
+    $content .= "        {'data': 'links'},\n";
     $content .= "        {'data': 'description'},\n";
     $content .= "        {'data': 'start'},\n";
     $content .= "        {'data': 'stop'},\n";

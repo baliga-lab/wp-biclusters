@@ -21,10 +21,11 @@ function genes_dt_callback() {
         $name = $g->gene_name;
 
         $g->gene_name = "<a href=\"index.php/gene/?gene=" . $name . "\">" . $name . "</a>";
+        $g->chromosome = "<a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $chrom . "\">" . $chrom . "</a>";
         // TODO: Tuberculist: http://tuberculist.epfl.ch/quicksearch.php?gene+name=Rv0005
         // TODO: PATRIC
-        $g->chromosome = "<a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $chrom . "\">" . $chrom . "</a>";
-        $g->accession = "<a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">" . $acc . "</a>";
+        $g->links = "<a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">" . NCBI . "</a><br>" .
+            "<a href=\"http://tuberculist.epfl.ch/quicksearch.php?gene+name=" . $name . "\">" . Tuberculist . "</a>";
     }
     $data = json_encode($genes);
     $summary_json = file_get_contents($source_url . "/api/v1.0.0/summary");
