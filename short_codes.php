@@ -213,27 +213,14 @@ function corem_categories_table_shortcode($attr, $content=null)
     return categories_table_html($cats);
 }
 
-function genes_table_html($genes)
+function genes_ajax_table_html($ajax_action, $user_params)
 {
-    $content = "<table id=\"genes\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Name</th><th>Common Name</th><th>Accession</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
-    $content .= "  <tbody>";
-    foreach ($genes as $g) {
-        $content .= "    <tr><td><a href=\"index.php/gene/?gene=" . $g->gene_name .  "\">". $g->gene_name . "</a></td><td>" . $g->common_name . "</td><td><a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $g->accession . "\">" . $g->accession ."</a></td><td>" . $g->description . "</td><td>" . $g->start . "</td><td>" . $g->stop . "</td><td>"  . $g->strand . "</td><td><a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $g->chromosome . "\">" . $g->chromosome . "</td></tr>";
+    // $user_params -> Javascript parameters
+    $js_params = '';
+    foreach ($user_params as $key => $value) {
+        $js_params .= ",'" . $key . "': '" . $value . "'";
     }
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#genes').DataTable({";
-    $content .= "    })";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
 
-function genes_table_shortcode($attr, $content)
-{
     $content = "<table id=\"genes\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>Name</th><th>Common Name</th><th>Links</th><th>Description</th><th>Start</th><th>Stop</th><th>Strand</th><th>Chromosome</th></tr></thead>";
     $content .= "  <tbody>";
@@ -257,12 +244,17 @@ function genes_table_shortcode($attr, $content)
     $content .= "      'ajax': {\n";
     $content .= "         'url': ajax_dt.ajax_url,\n";
     $content .= "         'type': 'GET',\n";
-    $content .= "         'data': {'action': 'genes_dt'}\n";
+    $content .= "         'data': {'action': '" . $ajax_action . "'" . $js_params .  "}\n";
     $content .= "     }\n";
     $content .= "    });\n";
     $content .= "  });\n";
     $content .= "</script>";
     return $content;
+}
+
+function genes_table_shortcode($attr, $content)
+{
+    return genes_ajax_table_html('genes_dt', array());
 }
 
 function gene_info_shortcode($attr, $content=null)
@@ -284,14 +276,10 @@ function gene_info_shortcode($attr, $content=null)
     return $content;
 }
 
-function corem_genes_table_shortcode($attr, $content=null)
+function corem_genes_table_shortcode($attr, $content)
 {
     $corem_id = get_query_var('corem');
-    $source_url = get_option('source_url', '');
-    $genes_json = file_get_contents($source_url . "/api/v1.0.0/corem_genes/" . $corem_id);
-    $genes = json_decode($genes_json)->genes;
-
-    return genes_table_html($genes);
+    return genes_ajax_table_html('corem_genes_dt', array('corem_id' => $corem_id));
 }
 
 function corem_coexpressions_graph_shortcode($attr, $content)

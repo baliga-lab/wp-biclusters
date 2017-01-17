@@ -4,15 +4,16 @@
  * AJAX backend.
  */
 
-function genes_dt_callback() {
+function generic_genes_dt_callback($api_uri) {
     header("Content-type: application/json");
     $draw = intval($_GET['draw']);  // integer
     $start = $_GET['start'];  // integer
     $length = $_GET['length'];  // integer
 
     $source_url = get_option('source_url', '');
-    $genes_json = file_get_contents($source_url . "/api/v1.0.0/genes?start=" . $start . "&length=" . $length);
-    $genes = json_decode($genes_json)->genes;
+    $genes_json = file_get_contents($source_url . $api_uri . "?start=" . $start . "&length=" . $length);
+    $result = json_decode($genes_json);
+    $genes = $result->genes;
 
     // turn gene_name, accession and chromosome into links before sending them to DataTables
     foreach ($genes as $g) {
@@ -22,18 +23,12 @@ function genes_dt_callback() {
 
         $g->gene_name = "<a href=\"index.php/gene/?gene=" . $name . "\">" . $name . "</a>";
         $g->chromosome = "<a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $chrom . "\">" . $chrom . "</a>";
-        // TODO: Tuberculist: http://tuberculist.epfl.ch/quicksearch.php?gene+name=Rv0005
         // TODO: PATRIC
-        $g->links = "<a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">" . NCBI . "</a><br>" .
-            "<a href=\"http://tuberculist.epfl.ch/quicksearch.php?gene+name=" . $name . "\">" . Tuberculist . "</a>";
+        $g->links = "<a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">NCBI</a><br>" .
+            "<a href=\"http://tuberculist.epfl.ch/quicksearch.php?gene+name=" . $name . "\">Tuberculist</a>";
     }
     $data = json_encode($genes);
-    $summary_json = file_get_contents($source_url . "/api/v1.0.0/summary");
-    $summary = json_decode($summary_json);
-
-    error_log("start: " . $start . " length: " . $length);
-    $records_total = $summary->num_genes;
-
+    $records_total = $result->total;
     $doc = <<<EOT
 {
   "draw": $draw,
@@ -44,6 +39,15 @@ function genes_dt_callback() {
 EOT;
     echo $doc;
     wp_die();
+}
+
+function genes_dt_callback() {
+    return generic_genes_dt_callback("/api/v1.0.0/genes");
+}
+
+function corem_genes_dt_callback() {
+    $corem_id = $_GET['corem_id'];
+    return generic_genes_dt_callback("/api/v1.0.0/corem_genes/" . $corem_id);
 }
 
 function biclusters_dt_callback() {
@@ -117,6 +121,9 @@ function biclusters_datatables_source_init()
     add_action('wp_ajax_biclusters_dt', 'biclusters_dt_callback');
     add_action('wp_ajax_nopriv_corem_coexps_dt', 'corem_coexps_dt_callback');
     add_action('wp_ajax_corem_coexps_dt', 'corem_coexps_dt_callback');
+
+    add_action('wp_ajax_nopriv_corem_genes_dt', 'corem_genes_dt_callback');
+    add_action('wp_ajax_corem_genes_dt', 'corem_genes_dt_callback');
 }
 
 ?>
