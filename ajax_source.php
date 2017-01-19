@@ -9,9 +9,9 @@ function generic_genes_dt_callback($api_uri) {
     $draw = intval($_GET['draw']);  // integer
     $start = $_GET['start'];  // integer
     $length = $_GET['length'];  // integer
-
+    $search_str = $_GET['search']['value'];
     $source_url = get_option('source_url', '');
-    $genes_json = file_get_contents($source_url . $api_uri . "?start=" . $start . "&length=" . $length);
+    $genes_json = file_get_contents($source_url . $api_uri . "?start=" . $start . "&length=" . $length . "&search=" . $search_str);
     $result = json_decode($genes_json);
     $genes = $result->genes;
 
@@ -24,8 +24,8 @@ function generic_genes_dt_callback($api_uri) {
         $g->gene_name = "<a href=\"index.php/gene/?gene=" . $name . "\">" . $name . "</a>";
         $g->chromosome = "<a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $chrom . "\">" . $chrom . "</a>";
         // TODO: PATRIC
-        $g->links = "<a href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">NCBI</a><br>" .
-            "<a href=\"http://tuberculist.epfl.ch/quicksearch.php?gene+name=" . $name . "\">Tuberculist</a>";
+        $g->links = "<a target=\"_blank\" href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">NCBI</a><br>" .
+            "<a target=\"_blank\" href=\"http://tuberculist.epfl.ch/quicksearch.php?gene+name=" . $name . "\">Tuberculist</a>";
     }
     $data = json_encode($genes);
     $records_total = $result->total;
