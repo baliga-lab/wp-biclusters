@@ -186,8 +186,14 @@ function corem_conditions_table_shortcode($attr, $content=null)
 
 function categories_table_html($categories)
 {
-    $content = "<table id=\"categories\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Name</th><th>p.adj</th></tr></thead>";
+    $num_categories = count($categories);
+    if ($num_categories == 1) {
+        $content = "<h4>Enriched in 1 Functional Category</h4>";
+    } else {
+        $content = "<h4>Enriched in " . count($categories) . " Functional Categories</h4>";
+    }
+    $content .= "<table id=\"categories\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>Name</th><th>q-value</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($categories as $c) {
         $content .= "    <tr><td>" . $c->category . "</td><td>" . $c->p_adj . "</td></tr>";
@@ -323,8 +329,12 @@ function corem_condition_blocks_shortcode($attr, $content)
     $source_url = get_option('source_url', '');
     $blocks_json = file_get_contents($source_url . "/api/v1.0.0/corem_condition_enrichment/" . $corem_id);
     $blocks = json_decode($blocks_json)->condition_blocks;
-
-    $content = "<h4>Enriched in " . count($blocks) . " Condition Blocks</h4>";
+    $num_blocks = count($blocks);
+    if ($num_blocks == 1) {
+        $content = "<h4>Enriched in 1 Condition Block</h4>";
+    } else {
+        $content = "<h4>Enriched in " . count($blocks) . " Condition Blocks</h4>";
+    }
     $content .= '<div>';
     $block_num = 1;
     foreach ($blocks as $b) {
@@ -450,7 +460,12 @@ function gene_biclusters_table_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     $clusters_json = file_get_contents($source_url . "/api/v1.0.0/gene_biclusters/" . $gene);
     $clusters = json_decode($clusters_json)->biclusters;
-    $content = "<h3>Contained in " . count($clusters) . " biclusters</h3>";
+    $num_clusters = count($clusters);
+    if ($num_clusters == 1) {
+        $content = "<h4>Contained in 1 Bicluster</h4>";
+    } else {
+        $content = "<h4>Contained in " . count($clusters) . " Biclusters</h4>";
+    }
     return $content . biclusters_table_html($clusters);
 }
 
@@ -479,12 +494,13 @@ function gene_corems_table_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     $corems_json = file_get_contents($source_url . "/api/v1.0.0/corems_with_gene/" . $gene);
     $corems = json_decode($corems_json)->corem_infos;
-    $content = "<h3>Contained in " . count($corems) . " corems</h3>";
-    if (count($corems) > 0) {
-        return $content . corems_table_html($corems);
+    $num_corems = count($corems);
+    if ($num_corems == 1) {
+        $content = "<h4>Contained in 1 Corem</h4>";
     } else {
-        return $content;
+        $content = "<h4>Contained in " . count($corems) . " Corems</h4>";
     }
+    return $content . corems_table_html($corems);
 }
 
 function condition_biclusters_table_shortcode($attr, $content=null)
