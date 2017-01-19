@@ -407,7 +407,13 @@ function condition_blocks_shortcode($attr, $content=null)
 
 function biclusters_table_html($clusters)
 {
-    $content = "<table id=\"biclusters\" class=\"stripe row-border\">";
+    $num_clusters = count($clusters);
+    if ($num_clusters == 1) {
+        $content = "<h4>Contained in 1 Bicluster</h4>";
+    } else {
+        $content = "<h4>Contained in " . $num_clusters . " Biclusters</h4>";
+    }
+    $content .= "<table id=\"biclusters\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>Bicluster ID</th><th># Genes</th><th># Conditions</th><th>Residual</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($clusters as $c) {
@@ -461,11 +467,6 @@ function gene_biclusters_table_shortcode($attr, $content=null)
     $clusters_json = file_get_contents($source_url . "/api/v1.0.0/gene_biclusters/" . $gene);
     $clusters = json_decode($clusters_json)->biclusters;
     $num_clusters = count($clusters);
-    if ($num_clusters == 1) {
-        $content = "<h4>Contained in 1 Bicluster</h4>";
-    } else {
-        $content = "<h4>Contained in " . count($clusters) . " Biclusters</h4>";
-    }
     return $content . biclusters_table_html($clusters);
 }
 
