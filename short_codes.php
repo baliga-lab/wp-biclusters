@@ -180,6 +180,11 @@ function corem_conditions_table_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     $conds_json = file_get_contents($source_url . "/api/v1.0.0/corem_conditions/" . $corem_id);
     $conds = json_decode($conds_json)->conditions;
+    if (count($conds) == 1) {
+        $content = '<h4>Enriched in 1 Condition</h4>';
+    } else {
+        $content = '<h4>Enriched in ' . count($conds) . ' Conditions</h4>';
+    }
 
     return conditions_table_html($conds);
 }
