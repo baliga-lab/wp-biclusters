@@ -335,13 +335,22 @@ function corem_condition_blocks_shortcode($attr, $content)
     } else {
         $content = "<h4>Enriched in " . count($blocks) . " Condition Blocks</h4>";
     }
-    $content .= '<div>';
+    $content .= '<table id="corem_condition_blocks" class="stripe row-border">';
+    $content .= '  <thead><tr><th>#</th><th>Name</th><th>q-value</th></tr></thead>';
+    $content .= '  <tbody>';
     $block_num = 1;
     foreach ($blocks as $b) {
-        $content .= "  <div>" . $block_num . ". " . $b->name . " (q-value: " . $b->q_value.  ")</div>";
+        $content .= "  <tr><td>" . $block_num . "</td><td>" . $b->name . "</td><td>" . $b->q_value.  "</td></tr>";
         $block_num++;
     }
-    $content .= '</div>';
+    $content .= '  </tbody>';
+    $content .= '</table>';
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#corem_condition_blocks').DataTable({";
+    $content .= "    })";
+    $content .= "  });";
+    $content .= "</script>";
     return $content;
 }
 
@@ -352,8 +361,12 @@ function corem_gres_shortcode($attr, $content)
     $source_url = get_option('source_url', '');
     $gres_json = file_get_contents($source_url . "/api/v1.0.0/corem_gres/" . $corem_id);
     $gres = json_decode($gres_json)->gres;
-
-    $content = '<div>';
+    if (count($gres) == 1) {
+        $content = '<h4>Enriched in 1 GRE</h4>';
+    } else {
+        $content = '<h4>Enriched in ' . count($gres) . ' GREs</h4>';
+    }
+    $content .= '<div>';
     foreach ($gres as $g) {
         $content .= '<div>GRE: ' . $g->gre . ' q-value: ' . $g->q_value .'</div>';
         $content .= '<div>[Motif placeholder]</div>';
