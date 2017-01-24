@@ -1,0 +1,36 @@
+h1, h2, h3 {
+    font-family: Verdana, Helvetica, sans-serif;
+}
+#browser {
+    border: 1px solid black;
+}
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+.axis text {
+    font: 10px sans-serif;
+    color: #000;
+}
+.axis-label {
+    font: 10px sans-serif;
+    color: #000;
+}
+.line {
+    fill: none;
+    stroke: #000;
+    stroke-width: 1;
+}
+.gre-panel {
+    list-style-type: none;
+    columns: 4;
+    font-family: Verdana, Helvetica, sans-serif;
+    font-size: 8pt;
+}
+.corem-panel {
+    list-style-type: none;
+    columns: 3;
+    font-family: Verdana, Helvetica, sans-serif;
+    font-size: 8pt;
+}

@@ -186,7 +186,7 @@ function corem_conditions_table_shortcode($attr, $content=null)
         $content = '<h4>Enriched in ' . count($conds) . ' Conditions</h4>';
     }
 
-    return conditions_table_html($conds);
+    return $content . conditions_table_html($conds);
 }
 
 function categories_table_html($categories)
@@ -548,6 +548,27 @@ function bicluster_info_shortcode($attr, $content=null)
     return $content;
 }
 
+function gene_gre_browser_shortcode($attr, $content)
+{
+    $gene = get_query_var('gene');
+    if (!$gene) return "(no gene provided)";
+    $source_url = get_option('source_url', '');
+    $content = "<h4>GREs for Gene " . $gene . "</h4>";
+    $content .= "<h5>Corems</h5>";
+    $content .= '<div id="corem-panel"></div>';
+    $content .= "<h5>GREs</h5>";
+    $content .= '<div id="gre-panel"></div>';
+    $content .= '<svg id="gene_gre_browser"></svg>';
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= '    corem_browser.init("#gene_gre_browser", "#gre-panel", "#corem-panel",';
+    $content .= '                       { width: 640, height: 220, apiURL: "' . $source_url . '", gene: "' . $gene . '" });';
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+
 function biclusters_add_shortcodes()
 {
     add_shortcode('bicluster_genes', 'bicluster_genes_shortcode');
@@ -563,6 +584,7 @@ function biclusters_add_shortcodes()
     add_shortcode('gene_info', 'gene_info_shortcode');
     add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
     add_shortcode('gene_corems_table', 'gene_corems_table_shortcode');
+    add_shortcode('gene_gre_browser', 'gene_gre_browser_shortcode');
 
     add_shortcode('bicluster_motifs', 'bicluster_motifs_shortcode');
     add_shortcode('model_overview', 'model_overview_shortcode');
