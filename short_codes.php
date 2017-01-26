@@ -371,12 +371,20 @@ function corem_gres_shortcode($attr, $content)
     } else {
         $content = '<h4>Enriched in ' . count($gres) . ' GREs</h4>';
     }
-    $content .= '<div>';
+    $content .= '<table id="corem_gres" class="stripe row-border">';
+    $content .= '  <thead><tr><th>GRE</th><th>q-value</th><th># Motifs</th></tr></thead>';
+    $content .= '  <tbody>';
     foreach ($gres as $g) {
-        $content .= '<div>GRE: ' . $g->gre . ' q-value: ' . $g->q_value .'</div>';
-        $content .= '<div>[Motif placeholder]</div>';
+        $content .= '<tr><td>' . $g->gre . '</td><td>' . $g->q_value .'</td><td>' . count($g->motifs) .  '</td></tr>';
     }
-    $content .= '</div>';
+    $content .= '  </tbody>';
+    $content .= '</table>';
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#corem_gres').DataTable({";
+    $content .= "    })";
+    $content .= "  });";
+    $content .= "</script>";
     return $content;
 }
 
