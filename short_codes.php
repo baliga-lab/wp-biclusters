@@ -372,17 +372,25 @@ function corem_gres_shortcode($attr, $content)
         $content = '<h4>Enriched in ' . count($gres) . ' GREs</h4>';
     }
     $content .= '<table id="corem_gres" class="stripe row-border">';
-    $content .= '  <thead><tr><th>GRE</th><th>q-value</th><th># Motifs</th></tr></thead>';
+    $content .= '  <thead><tr><th>GRE</th><th>q-value</th><th>Motif</th></tr></thead>';
     $content .= '  <tbody>';
     foreach ($gres as $g) {
-        $content .= '<tr><td>' . $g->gre . '</td><td>' . $g->q_value .'</td><td>' . count($g->motifs) .  '</td></tr>';
+        $content .= '<tr><td>' . $g->gre . '</td><td>' . $g->q_value .'</td><td><span id="gre_pssm_' . $g->gre . '"></span></td></tr>';
     }
     $content .= '  </tbody>';
     $content .= '</table>';
     $content .= "<script>";
+    foreach ($gres as $g) {
+        $content .= 'var gre_pssm_' . $g->gre . ' = ' . json_encode($g->pssm) . ';';
+    }
     $content .= "  jQuery(document).ready(function() {";
     $content .= "    jQuery('#corem_gres').DataTable({";
-    $content .= "    })";
+    $content .= "      'columnDefs': [ {'width': '15%', 'targets': 0}, {'width': '15%', 'targets': 1}, {'width': '70%'} ]";
+    $content .= "    });";
+
+    foreach ($gres as $g) {
+        $content .= '  isblogo.makeLogo("gre_pssm_' . $g->gre . '", gre_pssm_' . $g->gre . ', {width: 400, height: 120, glyphStyle: "20pt Helvetica"});';
+    }
     $content .= "  });";
     $content .= "</script>";
     return $content;

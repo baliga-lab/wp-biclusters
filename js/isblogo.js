@@ -99,7 +99,6 @@ if (!isblogo) {
                 currentGlyph = pssm.alphabet[columnRanks[row][0]];
                 size = drawFun(currentGlyph, x, y, scalex, yHeight,
                                rseq * columnRanks[row][1]);
-                console.debug('mpos: ' + motifPos + ' height: ' + size.height);
                 if (size.width > maxWidth) {
                     maxWidth = size.width;
                 }
