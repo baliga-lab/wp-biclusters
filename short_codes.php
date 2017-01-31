@@ -341,12 +341,10 @@ function corem_condition_blocks_shortcode($attr, $content)
         $content = "<h4>Enriched in " . count($blocks) . " Condition Blocks</h4>";
     }
     $content .= '<table id="corem_condition_blocks" class="stripe row-border">';
-    $content .= '  <thead><tr><th>#</th><th>Name</th><th>q-value</th></tr></thead>';
+    $content .= '  <thead><tr><th>Name</th><th>q-value</th></tr></thead>';
     $content .= '  <tbody>';
-    $block_num = 1;
     foreach ($blocks as $b) {
-        $content .= "  <tr><td>" . $block_num . "</td><td>" . $b->name . "</td><td>" . $b->q_value.  "</td></tr>";
-        $block_num++;
+        $content .= "  <tr><td>" . $b->name . "</td><td>" . $b->q_value.  "</td></tr>";
     }
     $content .= '  </tbody>';
     $content .= '</table>';
