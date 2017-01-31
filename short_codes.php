@@ -569,7 +569,7 @@ function gene_gre_browser_shortcode($attr, $content)
     $gene = get_query_var('gene');
     if (!$gene) return "(no gene provided)";
     $source_url = get_option('source_url', '');
-    $content = "<h4>GREs for Gene " . $gene . "</h4>";
+    $content = "<h4>Promotor architecture for " . $gene . "</h4>";
     $content .= "<h5>Corems</h5>";
     $content .= '<div id="corem-panel"></div>';
     $content .= "<h5>GREs</h5>";
