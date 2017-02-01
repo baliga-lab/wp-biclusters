@@ -378,10 +378,10 @@ function corem_gres_shortcode($attr, $content)
         $content = '<h4>Enriched in ' . count($gres) . ' GREs</h4>';
     }
     $content .= '<table id="corem_gres" class="stripe row-border">';
-    $content .= '  <thead><tr><th>GRE</th><th>q-value</th><th>Motif</th></tr></thead>';
+    $content .= '  <thead><tr><th>GRE</th><th>Motif</th><th>Motif e-value</th><th>q-value</th></tr></thead>';
     $content .= '  <tbody>';
     foreach ($gres as $g) {
-        $content .= '<tr><td>' . $g->gre . '</td><td>' . $g->q_value .'</td><td><span id="gre_pssm_' . $g->gre . '"></span></td></tr>';
+        $content .= '<tr><td>' . $g->gre . '</td><td><span id="gre_pssm_' . $g->gre . '"></span></td><td>' . $g->motif_evalue . '</td><td>' . $g->q_value .'</td></tr>';
     }
     $content .= '  </tbody>';
     $content .= '</table>';
@@ -391,7 +391,7 @@ function corem_gres_shortcode($attr, $content)
     }
     $content .= "  jQuery(document).ready(function() {";
     $content .= "    jQuery('#corem_gres').DataTable({";
-    $content .= "      'columnDefs': [ {'width': '15%', 'targets': 0}, {'width': '15%', 'targets': 1}, {'width': '70%'} ]";
+    $content .= "      'columnDefs': [ {'width': '10%', 'targets': 0}, {'width': '70%', 'targets': 1}, {'width': '10%', 'targets': 2} ]";
     $content .= "    });";
 
     foreach ($gres as $g) {
