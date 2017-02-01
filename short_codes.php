@@ -293,6 +293,12 @@ function corem_genes_table_shortcode($attr, $content)
     return genes_ajax_table_html('corem_genes_dt', array('corem_id' => $corem_id));
 }
 
+function corem_title_shortcode($attr, $content)
+{
+    $corem_id = get_query_var('corem');
+    return "<h3>Corem " . $corem_id . "</h3>";
+}
+
 function corem_coexpressions_graph_shortcode($attr, $content)
 {
     $corem_id = get_query_var('corem');
@@ -594,6 +600,7 @@ function biclusters_add_shortcodes()
     add_shortcode('corem_coexpressions_graph', 'corem_coexpressions_graph_shortcode');
     add_shortcode('corem_condition_blocks', 'corem_condition_blocks_shortcode');
     add_shortcode('corem_gres', 'corem_gres_shortcode');
+    add_shortcode('corem_title', 'corem_title_shortcode');
 
     add_shortcode('gene_info', 'gene_info_shortcode');
     add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
