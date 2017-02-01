@@ -276,7 +276,6 @@ function gene_info_shortcode($attr, $content=null)
     $gene_json = file_get_contents($source_url . "/api/v1.0.0/gene_info/" . $gene_name);
     $gene = json_decode($gene_json)->gene;
     $content = "<div>";
-    $content .= "Name: " . $gene->gene_name . "<br>";
     $content .= "Common Name: " . $gene->common_name . "<br>";
     $content .= "Accession: " . $gene->accession . "<br>";
     $content .= "Description: " . $gene->description . "<br>";
@@ -527,6 +526,12 @@ function corems_table_html($corems)
     return $content;
 }
 
+function gene_title_shortcode($attr, $content)
+{
+    $gene = get_query_var('gene');
+    return "<h3>" . $gene . "</h3>";
+}
+
 function gene_corems_table_shortcode($attr, $content=null)
 {
     $gene = get_query_var('gene');
@@ -602,6 +607,7 @@ function biclusters_add_shortcodes()
     add_shortcode('corem_gres', 'corem_gres_shortcode');
     add_shortcode('corem_title', 'corem_title_shortcode');
 
+    add_shortcode('gene_title', 'gene_title_shortcode');
     add_shortcode('gene_info', 'gene_info_shortcode');
     add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
     add_shortcode('gene_corems_table', 'gene_corems_table_shortcode');
