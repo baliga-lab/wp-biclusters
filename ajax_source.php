@@ -24,8 +24,9 @@ function generic_genes_dt_callback($api_uri) {
         $g->gene_name = "<a href=\"index.php/gene/?gene=" . $name . "\">" . $name . "</a>";
         $g->chromosome = "<a href=\"https://www.ncbi.nlm.nih.gov/nuccore/" . $chrom . "\">" . $chrom . "</a>";
         // TODO: PATRIC
-        $g->links = "<a target=\"_blank\" href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">NCBI</a><br>" .
-            "<a target=\"_blank\" href=\"http://tuberculist.epfl.ch/quicksearch.php?gene+name=" . $name . "\">Tuberculist</a>";
+        $g->links = "<a class=\"small-link\" target=\"_blank\" href=\"https://www.ncbi.nlm.nih.gov/protein/" . $acc . "\">NCBI</a><br>" .
+            "<a class=\"small-link\" target=\"_blank\" href=\"http://tuberculist.epfl.ch/quicksearch.php?gene+name=" . $name . "\">Tuberculist</a><br>" .
+            "<a class=\"small-link\" target=\"_blank\" href=\"http://networks.systemsbiology.net/mtb/genes/" . $name . "\">MTB EGRIN</a>";
     }
     $data = json_encode($genes);
     $records_total = $result->total;
