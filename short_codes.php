@@ -277,11 +277,14 @@ function gene_info_shortcode($attr, $content=null)
     $gene = json_decode($gene_json)->gene;
     $content = "<div>";
     $content .= "Common Name: " . $gene->common_name . "<br>";
-    $content .= "Accession: " . $gene->accession . "<br>";
+    $content .= "Accession: <a target=\"_blank\" href=\"https://www.ncbi.nlm.nih.gov/protein/" . $gene->accession . "\">" . $gene->accession . "</a><br>";
     $content .= "Description: " . $gene->description . "<br>";
     $content .= "Chromosome: " . $gene->chromosome . "<br>";
     $content .= "Strand: " . $gene->strand . "<br>";
     $content .= "Position: " . $gene->start . "-" .  $gene->stop . "<br>";
+    $content .= "-&gt; <a target=\"_blank\" href=\"http://tuberculist.epfl.ch/quicksearch.php?gene+name=" . $gene_name . "\">Tuberculist</a><br>";
+
+
     $content .= "</div>";
     return $content;
 }
