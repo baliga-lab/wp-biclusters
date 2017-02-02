@@ -106,6 +106,7 @@ if (!seqlogo) {
             }
             x += maxWidth;
         }
+        return x;
     }
 
     // **********************************************************************
@@ -155,29 +156,6 @@ if (!seqlogo) {
         first = firstLine(imageData);
         context.clearRect(0, 0, MEASURE_CANVAS.width, MEASURE_CANVAS.height);
         return lastLine(imageData) - first + 1;
-    }
-
-
-    function drawLabelsX(context, startx, y) {
-        context.font = '12pt Arial';
-        var intervalDistance, x, textHeight, i, label, labelWidth, transx, transy;
-        intervalDistance = 20;
-        x = startx;
-        textHeight = measureText('M', context.font, 1.0, 1.0);
-
-        for (i = 10; i < 150; i += 10) {
-            context.save();
-            label = i.toString();
-            labelWidth = context.measureText(label).width;
-            transx = x + labelWidth / 2.0;
-            transy = y - textHeight / 2.0;
-            context.translate(transx, transy);
-            context.rotate(-Math.PI / 2);
-            context.translate(-transx, -transy);
-            context.fillText(label, x, y);
-            x += intervalDistance;
-            context.restore();
-        }
     }
 
     function drawLabelsY(context, numBits, x0, y0, yHeight) {
@@ -237,7 +215,6 @@ if (!seqlogo) {
             numBits = Math.ceil(log(pssm.alphabet.length, 2)),
             bottom = canvas.height - MARGIN_BOTTOM;
         drawAxis(context, numBits, right, bottom);
-        //drawLabelsX(context, MARGIN_LEFT, canvas.height);
         drawLabelsY(context, numBits, MARGIN_LEFT - 25, bottom, bottom - MARGIN_TOP);
     }
 
@@ -281,14 +258,38 @@ if (!seqlogo) {
         sumColumnWidthsNormal = context.measureText('W').width * pssm.values.length;
         xWidth = canvas.width - (MARGIN_LEFT + MARGIN_RIGHT);
         scalex = xWidth / sumColumnWidthsNormal;
-        drawPSSM(pssm, scalex,
-                 canvas.height - MARGIN_BOTTOM, yHeight,
-                 function (currentGlyph, x, y, scalex, yHeight, weight) {
-                     return drawGlyph(context, currentGlyph,
-                                      colorTableFor(pssm), x, y,
-                                      scalex, yHeight,
-                                      maxFontHeightNormal, weight);
-            });
+        var lastX = drawPSSM(pssm, scalex,
+                             canvas.height - MARGIN_BOTTOM, yHeight,
+                             function (currentGlyph, x, y, scalex, yHeight, weight) {
+                                 return drawGlyph(context, currentGlyph,
+                                                  colorTableFor(pssm), x, y,
+                                                  scalex, yHeight,
+                                                  maxFontHeightNormal, weight);
+                             });
+        return (lastX - MARGIN_LEFT) / pssm.values.length;
+    }
+
+    function drawTicksX(canvas, pssm,  interval) {
+        var context = canvas.getContext('2d'), bottom = canvas.height - MARGIN_BOTTOM;
+        context.font = '12pt Arial';
+        context.fillStyle = 'black';
+        for (var i = 1; i <= pssm.values.length; i++) {
+            var x = MARGIN_LEFT + i * interval;
+            var xi = x - interval / 2;
+            var tickHeight = (i % 5 == 0) ? 10 : 5;
+            context.beginPath();
+            context.moveTo(xi, bottom);
+            context.lineTo(xi, bottom + tickHeight);
+            context.stroke();
+            if (i % 5 == 0) {
+                var label = i.toString();
+                var textdim = context.measureText(label);
+                // the TextMetrics object currently does not have any other attributes
+                // than width, so we simply specify a text height
+                var textHeight = 14;
+                context.fillText(label, xi - textdim.width / 2, bottom + tickHeight + textHeight);
+            }
+        }
     }
 
     function makeCanvas(id, options, pssm) {
@@ -300,7 +301,8 @@ if (!seqlogo) {
         elem = document.getElementById(id);
         elem.parentNode.replaceChild(canvas, elem);
         drawScale(canvas, pssm);
-        drawGlyphs(canvas, options, pssm);
+        var interval = drawGlyphs(canvas, options, pssm);
+        drawTicksX(canvas, pssm, interval);
     }
 
     // **********************************************************************
