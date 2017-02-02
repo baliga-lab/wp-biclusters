@@ -86,7 +86,7 @@ function biclusters_init()
     wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'));
     // for debugging only
     //wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.js', array('jquery'));
-    wp_enqueue_script('isblogo', plugin_dir_url(__FILE__) . 'js/isblogo.js', array('jquery'));
+    wp_enqueue_script('seqlogo', plugin_dir_url(__FILE__) . 'js/seqlogo.js', array('jquery'));
     wp_enqueue_script('corem_browser', plugin_dir_url(__FILE__) . 'js/corem_browser.js', array('jquery'));
     wp_enqueue_script('qtip', plugin_dir_url(__FILE__) . 'js/jquery.qtip.min.js', array('jquery'), false, true);
     wp_enqueue_script('highcharts', plugin_dir_url(__FILE__) . 'js/highcharts.js', array('jquery'));

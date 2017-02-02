@@ -84,8 +84,8 @@ function bicluster_motifs_shortcode($atts, $content=null)
     $content .= "  };";
     $content .= "  var motifs = " . $motifs_json . ";\n";
     $content .= "  jQuery(document).ready(function() {";
-    $content .= "    isblogo.makeLogo('canvas_1', motifs['motifs'][0], canvasOptions);";
-    $content .= "    isblogo.makeLogo('canvas_2', motifs['motifs'][1], canvasOptions);";
+    $content .= "    seqlogo.makeLogo('canvas_1', motifs['motifs'][0], canvasOptions);";
+    $content .= "    seqlogo.makeLogo('canvas_2', motifs['motifs'][1], canvasOptions);";
     $content .= "  });";
     $content .= "</script>";
     return $content;
@@ -395,7 +395,7 @@ function corem_gres_shortcode($attr, $content)
     $content .= "    });";
 
     foreach ($gres as $g) {
-        $content .= '  isblogo.makeLogo("gre_pssm_' . $g->gre . '", gre_pssm_' . $g->gre . ', {width: 400, height: 120, glyphStyle: "20pt Helvetica"});';
+        $content .= '  seqlogo.makeLogo("gre_pssm_' . $g->gre . '", gre_pssm_' . $g->gre . ', {width: 400, height: 120, glyphStyle: "20pt Helvetica"});';
     }
     $content .= "  });";
     $content .= "</script>";
