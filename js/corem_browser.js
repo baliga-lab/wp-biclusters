@@ -5,6 +5,7 @@ var corem_browser = {};
     var MARGIN = {left: 20, bottom: 20, right: 20, top: 20};
     var COLORS = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange', 'purple'];
     var curves = [];
+    var greMaxValues = [];
 
     // module global chart scale, we might want to switch to an instance
     var xScale, yScale, xAxis, yAxis;
@@ -39,7 +40,6 @@ var corem_browser = {};
         var curve = chart.append("path").datum(data).attr("class", "line").attr("d", line)
             .attr('id', id)
             .style('stroke', color);
-        //curve.style('opacity', 0);
         curves[id] = curve;
     }
 
@@ -66,6 +66,10 @@ var corem_browser = {};
         return domain;
     }
 
+    function showCurve(greId, show) {
+        curves[greId].style('opacity', show ? 1 : 0);
+    }
+
     function makeGREPanel(grePanelSelector, gres) {
         var content = '<ul class="gre-panel">';
         content += '<li><input type="checkbox" id="use_GRE_all">All</li>';
@@ -73,7 +77,15 @@ var corem_browser = {};
             content += '<li style="color: ' + COLORS[i % COLORS.length] + '"><input id="use_' + gres[i] + '" type="checkbox" checked>' + gres[i] + '</li>';
         }
         content += '</ul>';
+        content += "<div style=\"margin-bottom: 5px;\"><label for=\"min_count\">Minimum GRE Count:</label> <input id=\"min_count\" type=\"number\" step=\"1\" value=\"1\"></input></div>";
+        content += "<div></div>";
         jQuery(grePanelSelector).html(content);
+        jQuery('#min_count').change(function(e) {
+            var minCount = jQuery(this).val(), greId;
+            for (greId in greMaxValues) {
+                showCurve(greId, greMaxValues[greId] >= minCount);
+            }
+        })
         jQuery('input[type=checkbox]').change(function(e) {
             var greId = e.target.id.substring(4)
             var checked = jQuery('#' + e.target.id).is(':checked');
@@ -82,15 +94,11 @@ var corem_browser = {};
                     var id = jQuery(this)[0].id.substring(4);
                     if (id != 'GRE_all') {
                         jQuery(this).prop('checked', checked);
-                        // toggle visibility by setting their opacity
-                        var curve = curves[id];
-                        curve.style('opacity', checked ? 1 : 0);
+                        showCurve(id, checked);
                     }
                 });
             } else {
-                var curve = curves[greId];
-                // toggle visibility by setting their opacity
-                curve.style('opacity', checked ? 1 : 0);
+                showCurve(greId, checked);
             }
         });
     }
@@ -130,6 +138,10 @@ var corem_browser = {};
                   for (var i in gres) {
                       var gredata = data.gres[gres[i]];
                       drawCurve(chart, options, gres[i], gredata, COLORS[i % COLORS.length]);
+                      var counts = gredata.map(function (a) {
+                          return a.count;
+                      });
+                      greMaxValues[gres[i]] = Math.max(...counts)
                   }
               }, "json");
 

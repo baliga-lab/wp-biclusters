@@ -34,3 +34,13 @@ h1, h2, h3 {
     font-family: Verdana, Helvetica, sans-serif;
     font-size: 8pt;
 }
+
+#min_count {
+    width: 60px;
+    text-align: right;
+}
+
+label {
+    font-family: Verdana, Helvetica, sans-serif;
+    font-weight: bold;
+}
