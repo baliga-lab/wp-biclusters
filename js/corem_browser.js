@@ -5,7 +5,9 @@ var corem_browser = {};
     var MARGIN = {left: 20, bottom: 20, right: 20, top: 20};
     var COLORS = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange', 'purple'];
     var curves = [];
+    var chipPeakCurves = [];
     var greMaxValues = [];
+    var greMaxValue = 0;
 
     // module global chart scale, we might want to switch to an instance
     var xScale, yScale, xAxis, yAxis;
@@ -41,6 +43,39 @@ var corem_browser = {};
             .attr('id', id)
             .style('stroke', color);
         curves[id] = curve;
+    }
+
+    function drawChipseqPeak(chart, options, chipseqPeaks, tf) {
+        var color = '#ff0000';
+        var line = d3.line()
+            .x(function(d) { return xScale(d.pos); })
+            .y(function(d) { return yScale(d.value); });
+        var id = 'chippeak_' + tf;
+        var pos = chipseqPeaks[tf];
+        var linedata1 = [
+            {pos: pos, value: 0},
+            {pos: pos, value: greMaxValue}
+        ];
+        chipPeakCurves[id] = chart.append("path")
+            .datum(linedata1)
+            .attr("class", "line")
+            .attr("d", line(linedata1))
+            .attr('id', id)
+            .style('stroke', color)
+            .style('stroke-width', '3');
+        chart.append('text')
+            .attr('x', xScale(pos))
+            .attr('y', yScale(greMaxValue))
+            .style('stroke', color)
+            .text(tf);
+    }
+
+    function drawChipSeqPeaks(chart, options, chipseqPeaks) {
+        var chipseqTFs = Object.keys(chipseqPeaks), tf, i, curve, id, linedata, position;
+        for (i = 0; i < chipseqTFs.length; i++) {
+            tf = chipseqTFs[i];
+            drawChipseqPeak(chart, options, chipseqPeaks, tf);
+        }
     }
 
     function findDomain(data, initDomain) {
@@ -85,7 +120,7 @@ var corem_browser = {};
             for (greId in greMaxValues) {
                 showCurve(greId, greMaxValues[greId] >= minCount);
             }
-        })
+        });
         jQuery('input[type=checkbox]').change(function(e) {
             var greId = e.target.id.substring(4)
             var checked = jQuery('#' + e.target.id).is(':checked');
@@ -117,7 +152,6 @@ var corem_browser = {};
         jQuery(coremPanelSelector).html(content);
     }
 
-
     corem_browser.init = function(svgSelector, grePanelSelector, coremPanelSelector, options) {
         var greURL = options.apiURL + "/api/v1.0.0/gene_gres/" + options.gene;
         var coremURL = options.apiURL + "/api/v1.0.0/corems_with_gene/" + options.gene;
@@ -130,6 +164,8 @@ var corem_browser = {};
               function (data, status, jqxhr) {
                   var gene = data.gene;
                   var gres = Object.keys(data.gres);
+                  var chipseqPeaks = data.chipseq_peaks;
+
                   makeGREPanel(grePanelSelector, gres);
 
                   var domain = initDomain(data);
@@ -142,7 +178,12 @@ var corem_browser = {};
                           return a.count;
                       });
                       greMaxValues[gres[i]] = Math.max(...counts)
+                      if (greMaxValues[gres[i]] > greMaxValue) {
+                          greMaxValue = greMaxValues[gres[i]];
+                      }
                   }
+                  drawChipSeqPeaks(chart, options, chipseqPeaks);
+
               }, "json");
 
         jQuery.get(coremURL, null,
