@@ -144,7 +144,7 @@ var corem_browser = {};
         } else {
             var content = '<ul class="corem-panel">';
             for (var i = 0; i < coremInfos.length; i++) {
-                var coremId = 'COREM_' + coremInfos[i].corem_id;
+                var coremId = 'COREM_' + coremInfos[i].id;
                 content += '<li><input type="radio" name="coremsel" value="' + coremId + '">' + coremId + '</li>';
             }
             content += '</ul>';
