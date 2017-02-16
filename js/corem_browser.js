@@ -90,7 +90,7 @@ var corem_browser = {};
 
     function initDomain(data) {
         var domain = {
-            'minx': 1000000, 'maxx': 0,
+            'minx': Number.MAX_SAFE_INTEGER, 'maxx': 0,
             'miny': 0, 'maxy': 0
         };
         var gres = Object.keys(data.gres);
@@ -165,24 +165,33 @@ var corem_browser = {};
                   var gene = data.gene;
                   var gres = Object.keys(data.gres);
                   var chipseqPeaks = data.chipseq_peaks;
+                  if (gres.length > 0) {
 
-                  makeGREPanel(grePanelSelector, gres);
+                      makeGREPanel(grePanelSelector, gres);
 
-                  var domain = initDomain(data);
-                  drawAxes(chart, options, domain);
+                      var domain = initDomain(data);
+                      drawAxes(chart, options, domain);
 
-                  for (var i in gres) {
-                      var gredata = data.gres[gres[i]];
-                      drawCurve(chart, options, gres[i], gredata, COLORS[i % COLORS.length]);
-                      var counts = gredata.map(function (a) {
-                          return a.count;
-                      });
-                      greMaxValues[gres[i]] = Math.max(...counts)
-                      if (greMaxValues[gres[i]] > greMaxValue) {
-                          greMaxValue = greMaxValues[gres[i]];
+                      for (var i in gres) {
+                          var gredata = data.gres[gres[i]];
+                          drawCurve(chart, options, gres[i], gredata, COLORS[i % COLORS.length]);
+                          var counts = gredata.map(function (a) {
+                              return a.count;
+                          });
+                          greMaxValues[gres[i]] = Math.max(...counts)
+                          if (greMaxValues[gres[i]] > greMaxValue) {
+                              greMaxValue = greMaxValues[gres[i]];
+                          }
                       }
+                      drawChipSeqPeaks(chart, options, chipseqPeaks);
+                  } else {
+                      chart.append("text")
+                          .attr("x", 100)
+                          .attr("y", 100)
+                          .style("text-anchor", "middle")
+                          .attr("dy", ".1em")
+                          .text("no GREs available");
                   }
-                  drawChipSeqPeaks(chart, options, chipseqPeaks);
 
               }, "json");
 
