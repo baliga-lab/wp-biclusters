@@ -590,7 +590,7 @@ function gene_gre_browser_shortcode($attr, $content)
     $content .= "<script>";
     $content .= "  jQuery(document).ready(function() {";
     $content .= '    corem_browser.init("#gene_gre_browser", "#gre-panel", "#corem-panel",';
-    $content .= '                       { width: 640, height: 220, apiURL: "' . $source_url . '", gene: "' . $gene . '" });';
+    $content .= '                       { width: 640, height: 220, minGRECount: 10, apiURL: "' . $source_url . '", gene: "' . $gene . '" });';
     $content .= "  });";
     $content .= "</script>";
     return $content;

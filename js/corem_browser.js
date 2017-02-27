@@ -105,21 +105,32 @@ var corem_browser = {};
         curves[greId].style('opacity', show ? 1 : 0);
     }
 
-    function makeGREPanel(grePanelSelector, gres) {
+    function minGRECountChanged(minGRECount) {
+        var visible, greId;
+        for (greId in greMaxValues) {
+            visible = greMaxValues[greId] >= minGRECount;
+            showCurve(greId, visible);
+            if (visible) {
+                jQuery('#grepanel_' + greId).show();
+            } else {
+                jQuery('#grepanel_' + greId).hide();
+            }
+        }
+    }
+
+    function makeGREPanel(grePanelSelector, gres, initialMinGRECount) {
         var content = '<ul class="gre-panel">';
         content += '<li><input type="checkbox" id="use_GRE_all">All</li>';
         for (var i = 0; i < gres.length; i++) {
-            content += '<li style="color: ' + COLORS[i % COLORS.length] + '"><input id="use_' + gres[i] + '" type="checkbox" checked>' + gres[i] + '</li>';
+            content += '<li id="grepanel_' + gres[i] + '" style="color: ' + COLORS[i % COLORS.length] + '"><input id="use_' + gres[i] + '" type="checkbox" checked>' + gres[i] + '</li>';
         }
         content += '</ul>';
-        content += "<div style=\"margin-bottom: 5px;\"><label for=\"min_count\">Minimum GRE Count:</label> <input id=\"min_count\" type=\"number\" step=\"1\" value=\"1\"></input></div>";
+        content += '<div style=\"margin-bottom: 5px;\"><label for=\"min_count\">Minimum GRE Count:</label> <input id=\"min_count\" type=\"number\" step=\"1\" value=\"' + initialMinGRECount + '\"></input></div>';
         content += "<div></div>";
         jQuery(grePanelSelector).html(content);
         jQuery('#min_count').change(function(e) {
-            var minCount = jQuery(this).val(), greId;
-            for (greId in greMaxValues) {
-                showCurve(greId, greMaxValues[greId] >= minCount);
-            }
+            var minCount = jQuery(this).val();
+            minGRECountChanged(minCount);
         });
         jQuery('input[type=checkbox]').change(function(e) {
             var greId = e.target.id.substring(4)
@@ -159,6 +170,10 @@ var corem_browser = {};
             .attr('height', options.height + MARGIN.bottom + MARGIN.top)
             .append("g")
             .attr("transform", "translate(" + MARGIN.left + ", " + MARGIN.top + ")");
+        var initialMinGRECount = 100;
+        if (typeof options.minGRECount !== "undefined") {
+            initialMinGRECount = options.minGRECount;
+        }
 
         jQuery.get(greURL, null,
               function (data, status, jqxhr) {
@@ -167,7 +182,7 @@ var corem_browser = {};
                   var chipseqPeaks = data.chipseq_peaks;
                   if (gres.length > 0) {
 
-                      makeGREPanel(grePanelSelector, gres);
+                      makeGREPanel(grePanelSelector, gres, initialMinGRECount);
 
                       var domain = initDomain(data);
                       drawAxes(chart, options, domain);
@@ -193,6 +208,8 @@ var corem_browser = {};
                           .text("no GREs available");
                   }
 
+                  // first time should set visibility
+                  minGRECountChanged(initialMinGRECount);
               }, "json");
 
         jQuery.get(coremURL, null,
