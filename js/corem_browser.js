@@ -2,8 +2,16 @@ var corem_browser = {};
 
 (function () {
 
-    var MARGIN = {left: 20, bottom: 20, right: 20, top: 20};
-    var COLORS = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange', 'purple'];
+    var MARGIN = {left: 20, bottom: 50, right: 20, top: 20};
+    var COLORS = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange', 'purple',
+                  'AquaMarine', 'BlueViolet', 'Brown', 'BurlyWood', 'CadetBlue', 'Chartreuse',
+                  'Chocolate', 'Coral', 'CornflowerBlue', 'Crimson', 'DarkBlue', 'DarkCyan',
+                  'DarkGoldenrod', 'DarkGreen', 'DarkMagenta', 'DarkOliveGreen', 'DarkOrange',
+                  'DarkRed', 'DarkSalmon', 'DarkSeaGreen', 'DarkSlateBlue', 'DarkSlateGray',
+                  'DarkTurquoise', 'DeepPink', 'DeepSkyBlue', 'DimGray', 'DodgerBlue', 'FireBrick',
+                  'ForestGreen', 'Indianred', 'Indigo', 'Navy', 'Orchid', 'Plum', 'RoyalBlue',
+                  'SeaGreen', 'SpringGreen', 'Teal', 'Tomato', 'YellowGreen'
+                 ];
     var curves = [];
     var chipPeakCurves = [];
     var greMaxValues = [];
@@ -207,6 +215,24 @@ var corem_browser = {};
                           .attr("dy", ".1em")
                           .text("no GREs available");
                   }
+                  var genebarHeight = 20;
+                  var genebarY = greMaxValue;
+                  var genebarX1 = gene.start < gene.stop ? xScale(gene.start) : xScale(gene.stop);
+                  var genebarX2 = gene.start < gene.stop ? xScale(gene.stop) : xScale(gene.start);
+                  var genebarWidth = Math.abs(genebarX2 - genebarX1);
+
+                  chart.append('rect')
+                      .attr("x", genebarX1)
+                      .attr("y", genebarY)
+                      .attr("width", genebarWidth).attr("height", genebarHeight)
+                      .style("fill", "orange")
+                      .style("stroke", "black")
+                      .append("title").text(function(d) { return gene.name + ' (' + gene.start + '-' + gene.stop + ')'; });
+                  chart.append("text")
+                      .attr("x", genebarX1)
+                      .attr("y", genebarY + genebarHeight / 2)
+                      .attr("dy", ".35em")
+                      .text(options.gene);
 
                   // first time should set visibility
                   minGRECountChanged(initialMinGRECount);
