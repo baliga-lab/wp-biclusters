@@ -216,7 +216,8 @@ var corem_browser = {};
                           .text("no GREs available");
                   }
                   var genebarHeight = 20;
-                  var genebarY = greMaxValue;
+                  var genebarY = options.height + 25;
+                  console.debug("genebarY: " + greMaxValue);
                   var genebarX1 = gene.start < gene.stop ? xScale(gene.start) : xScale(gene.stop);
                   var genebarX2 = gene.start < gene.stop ? xScale(gene.stop) : xScale(gene.start);
                   var genebarWidth = Math.abs(genebarX2 - genebarX1);
