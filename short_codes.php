@@ -104,7 +104,7 @@ function model_overview_shortcode($attr, $content=null)
     $content .= "    <tr><td><a href=\"index.php/conditions/\">" . $summary->num_conditions . "</a></td><td>Conditions</td></tr>";
     $content .= "    <tr><td><a href=\"index.php/corems/\">" . $summary->num_corems . "</a></td><td>Corems <img id=\"corem_help\" style=\"width: 18px\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></td></tr>";
     $content .= "    <tr><td><a href=\"index.php/biclusters/\">" . $summary->num_biclusters . "</a></td><td>Biclusters <img id=\"bicluster_help\" style=\"width: 18px\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></td></tr>";
-    $content .= "    <tr><td>" . $summary->num_gres . "</td><td>GREs <img id=\"gre_help\" style=\"width: 18px\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></td></tr>";
+    $content .= "    <tr><td><a href=\"index.php/gres/\">" . $summary->num_gres . "</a></td><td>GREs <img id=\"gre_help\" style=\"width: 18px\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></td></tr>";
     $content .= "  </tbody>";
     $content .= "</table>";
     $content .= "<script>";
@@ -500,6 +500,37 @@ function biclusters_table_shortcode($attr, $content)
     return $content;
 }
 
+function gres_table_shortcode($attr, $content)
+{
+    $content = "<table id=\"gres\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>GRE</th><th>Motif</th><th>Motif e-value</th><th># corems</th></tr></thead>";
+    $content .= "  <tbody>";
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {\n";
+    $content .= "    var table = jQuery('#gres').DataTable({\n";
+    $content .= "      'processing': true,\n";
+    $content .= "      'serverSide': true,\n";
+    $content .= "      'columns': [\n";
+    $content .= "        {'data': 'gre'},\n";
+    $content .= "        {'data': 'gre'},\n";
+    $content .= "        {'data': 'motif_evalue'},\n";
+    $content .= "        {'data': 'motif_evalue'}\n";
+    $content .= "      ],\n";
+    $content .= "      'ajax': {\n";
+    $content .= "         'url': ajax_dt.ajax_url,\n";
+    $content .= "         'type': 'GET',\n";
+    $content .= "         'data': {'action': 'gres_dt'}\n";
+    $content .= "     }\n";
+    $content .= "    });\n";
+    $content .= "    table.on('draw.dt', function() { console.log('draw GREs table: ' + table.rows().data().length); });\n";
+    $content .= "  });\n";
+    $content .= "</script>";
+    return $content;
+}
+
+
 function gene_biclusters_table_shortcode($attr, $content=null)
 {
     $gene = get_query_var('gene');
@@ -628,6 +659,7 @@ function biclusters_add_shortcodes()
     add_shortcode('conditions_table', 'conditions_table_shortcode');
     add_shortcode('genes_table', 'genes_table_shortcode');
     add_shortcode('biclusters_table', 'biclusters_table_shortcode');
+    add_shortcode('gres_table', 'gres_table_shortcode');
 }
 
 ?>

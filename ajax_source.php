@@ -109,6 +109,40 @@ EOT;
     wp_die();
 }
 
+
+function gres_dt_callback() {
+    header("Content-type: application/json");
+    $draw = intval($_GET['draw']);  // integer
+    $start = $_GET['start'];  // integer
+    $length = $_GET['length'];  // integer
+
+    $source_url = get_option('source_url', '');
+    $gres_json = file_get_contents($source_url . "/api/v1.0.0/gres?start=" . $start . "&length=" . $length);
+    $obj = json_decode($gres_json);
+    error_log($obj);
+    $gres = json_decode($gres_json)->gres;
+
+    foreach ($gres as $g) {
+        $gre->pssm_tag = "<span id=\"gre_pssm_" . $gre->gre . "\>GRE_" . $gre->gre . "</span>";
+    }
+    $summary_json = file_get_contents($source_url . "/api/v1.0.0/summary");
+    $summary = json_decode($summary_json);
+    $records_total = $summary->num_gres;
+    $data = json_encode($gres);
+
+    $doc = <<<EOT
+{
+  "draw": $draw,
+  "recordsTotal": $records_total,
+  "recordsFiltered": $records_total,
+  "data": $data
+}
+EOT;
+    echo $doc;
+    wp_die();
+}
+
+
 function biclusters_datatables_source_init()
 {
     // a hook Javascript to anchor our AJAX call
@@ -122,6 +156,8 @@ function biclusters_datatables_source_init()
     add_action('wp_ajax_biclusters_dt', 'biclusters_dt_callback');
     add_action('wp_ajax_nopriv_corem_coexps_dt', 'corem_coexps_dt_callback');
     add_action('wp_ajax_corem_coexps_dt', 'corem_coexps_dt_callback');
+    add_action('wp_ajax_nopriv_gres_dt', 'gres_dt_callback');
+    add_action('wp_ajax_gres_dt', 'gres_dt_callback');
 
     add_action('wp_ajax_nopriv_corem_genes_dt', 'corem_genes_dt_callback');
     add_action('wp_ajax_corem_genes_dt', 'corem_genes_dt_callback');
