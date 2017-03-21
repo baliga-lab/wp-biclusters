@@ -514,7 +514,7 @@ function gres_table_shortcode($attr, $content)
     $content .= "      'serverSide': true,\n";
     $content .= "      'columns': [\n";
     $content .= "        {'data': 'gre'},\n";
-    $content .= "        {'data': 'gre'},\n";
+    $content .= "        {'data': 'pssm_tag'},\n";
     $content .= "        {'data': 'motif_evalue'},\n";
     $content .= "        {'data': 'motif_evalue'}\n";
     $content .= "      ],\n";
@@ -524,7 +524,13 @@ function gres_table_shortcode($attr, $content)
     $content .= "         'data': {'action': 'gres_dt'}\n";
     $content .= "     }\n";
     $content .= "    });\n";
-    $content .= "    table.on('draw.dt', function() { console.log('draw GREs table: ' + table.rows().data().length); });\n";
+    $content .= "    table.on('draw.dt', function() {\n";
+    $content .= "       var i, numRows = table.rows().data().length;\n";
+    $content .= "       for (i = 0; i < numRows; i++) {\n";
+    $content .= "         var greObj = table.rows(i).data()[0];\n";
+    $content .= '         seqlogo.makeLogo("gre_pssm_" + greObj.gre, greObj.pssm, {width: 400, height: 120, glyphStyle: "20pt Helvetica"});';
+    $content .= "       }\n";
+    $content .= "     });\n";
     $content .= "  });\n";
     $content .= "</script>";
     return $content;

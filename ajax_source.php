@@ -122,8 +122,8 @@ function gres_dt_callback() {
     error_log($obj);
     $gres = json_decode($gres_json)->gres;
 
-    foreach ($gres as $g) {
-        $gre->pssm_tag = "<span id=\"gre_pssm_" . $gre->gre . "\>GRE_" . $gre->gre . "</span>";
+    foreach ($gres as $gre) {
+        $gre->pssm_tag = "<span id=\"gre_pssm_" . $gre->gre . "\">GRE_" . $gre->gre . "</span>";
     }
     $summary_json = file_get_contents($source_url . "/api/v1.0.0/summary");
     $summary = json_decode($summary_json);
