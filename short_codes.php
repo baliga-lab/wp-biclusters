@@ -381,7 +381,7 @@ function corem_gres_shortcode($attr, $content)
     $content .= '  <thead><tr><th>GRE</th><th>Motif</th><th>Motif e-value</th><th>q-value</th></tr></thead>';
     $content .= '  <tbody>';
     foreach ($gres as $g) {
-        if (empty(get_object_vars($g->pssm))) {
+        if (!get_object_vars($g->pssm)) {
             $content .= '<tr><td>' . $g->gre . '</td><td>N/A</td><td>-</td><td>' . $g->q_value .'</td></tr>';
         } else {
             $content .= '<tr><td>' . $g->gre . '</td><td><span id="gre_pssm_' . $g->gre . '"></span></td><td>' . $g->motif_evalue . '</td><td>' . $g->q_value .'</td></tr>';
@@ -391,7 +391,7 @@ function corem_gres_shortcode($attr, $content)
     $content .= '</table>';
     $content .= "<script>";
     foreach ($gres as $g) {
-        if (!empty(get_object_vars($g->pssm))) {
+        if (get_object_vars($g->pssm)) {
             $content .= 'var gre_pssm_' . $g->gre . ' = ' . json_encode($g->pssm) . ';';
         }
     }
@@ -401,7 +401,7 @@ function corem_gres_shortcode($attr, $content)
     $content .= "    });";
 
     foreach ($gres as $g) {
-        if (!empty(get_object_vars($g->pssm))) {
+        if (get_object_vars($g->pssm)) {
             $content .= '  seqlogo.makeLogo("gre_pssm_' . $g->gre . '", gre_pssm_' . $g->gre . ', {width: 400, height: 120, glyphStyle: "20pt Helvetica"});';
         }
     }
