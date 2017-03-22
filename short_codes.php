@@ -381,13 +381,19 @@ function corem_gres_shortcode($attr, $content)
     $content .= '  <thead><tr><th>GRE</th><th>Motif</th><th>Motif e-value</th><th>q-value</th></tr></thead>';
     $content .= '  <tbody>';
     foreach ($gres as $g) {
-        $content .= '<tr><td>' . $g->gre . '</td><td><span id="gre_pssm_' . $g->gre . '"></span></td><td>' . $g->motif_evalue . '</td><td>' . $g->q_value .'</td></tr>';
+        if (empty(get_object_vars($g->pssm))) {
+            $content .= '<tr><td>' . $g->gre . '</td><td>N/A</td><td>-</td><td>' . $g->q_value .'</td></tr>';
+        } else {
+            $content .= '<tr><td>' . $g->gre . '</td><td><span id="gre_pssm_' . $g->gre . '"></span></td><td>' . $g->motif_evalue . '</td><td>' . $g->q_value .'</td></tr>';
+        }
     }
     $content .= '  </tbody>';
     $content .= '</table>';
     $content .= "<script>";
     foreach ($gres as $g) {
-        $content .= 'var gre_pssm_' . $g->gre . ' = ' . json_encode($g->pssm) . ';';
+        if (!empty(get_object_vars($g->pssm))) {
+            $content .= 'var gre_pssm_' . $g->gre . ' = ' . json_encode($g->pssm) . ';';
+        }
     }
     $content .= "  jQuery(document).ready(function() {";
     $content .= "    jQuery('#corem_gres').DataTable({";
@@ -395,7 +401,9 @@ function corem_gres_shortcode($attr, $content)
     $content .= "    });";
 
     foreach ($gres as $g) {
-        $content .= '  seqlogo.makeLogo("gre_pssm_' . $g->gre . '", gre_pssm_' . $g->gre . ', {width: 400, height: 120, glyphStyle: "20pt Helvetica"});';
+        if (!empty(get_object_vars($g->pssm))) {
+            $content .= '  seqlogo.makeLogo("gre_pssm_' . $g->gre . '", gre_pssm_' . $g->gre . ', {width: 400, height: 120, glyphStyle: "20pt Helvetica"});';
+        }
     }
     $content .= "  });";
     $content .= "</script>";
@@ -516,7 +524,7 @@ function gres_table_shortcode($attr, $content)
     $content .= "        {'data': 'gre'},\n";
     $content .= "        {'data': 'pssm_tag'},\n";
     $content .= "        {'data': 'motif_evalue'},\n";
-    $content .= "        {'data': 'motif_evalue'}\n";
+    $content .= "        {'data': 'corems'}\n";
     $content .= "      ],\n";
     $content .= "      'ajax': {\n";
     $content .= "         'url': ajax_dt.ajax_url,\n";

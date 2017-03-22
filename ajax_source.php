@@ -119,11 +119,15 @@ function gres_dt_callback() {
     $source_url = get_option('source_url', '');
     $gres_json = file_get_contents($source_url . "/api/v1.0.0/gres?start=" . $start . "&length=" . $length);
     $obj = json_decode($gres_json);
-    error_log($obj);
     $gres = json_decode($gres_json)->gres;
 
     foreach ($gres as $gre) {
         $gre->pssm_tag = "<span id=\"gre_pssm_" . $gre->gre . "\">GRE_" . $gre->gre . "</span>";
+        $corem_links = array();
+        foreach ($gre->corems as $corem_id) {
+            array_push($corem_links, "<a href=\"index.php/corem/?corem=" . $corem_id . "\">" . $corem_id . "</a>");
+        }
+        $gre->corems = implode(", ", $corem_links);
     }
     $summary_json = file_get_contents($source_url . "/api/v1.0.0/summary");
     $summary = json_decode($summary_json);
