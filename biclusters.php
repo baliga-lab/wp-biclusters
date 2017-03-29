@@ -71,6 +71,7 @@ function add_query_vars_filter($vars) {
     $vars[] = "condition";
     $vars[] = "gene";
     $vars[] = "corem";
+    $vars[] = "search_term";
     return $vars;
 }
 
@@ -96,7 +97,18 @@ function biclusters_init()
     add_filter('query_vars', 'add_query_vars_filter');
 }
 
+function search_biclusters()
+{
+    $search_term = $_POST['search_term'];
+    error_log("search_biclusters(): " . $search_term);
+    $page = get_page_by_path('search-results');
+    wp_safe_redirect(get_permalink($page->ID) . "?search_term=" . $search_term);
+    exit;
+}
+
 add_action('admin_init', 'biclusters_settings_init');
 add_action('init', 'biclusters_init');
+add_action('admin_post_nopriv_search_biclusters', 'search_biclusters');
+add_action('admin_post_search_biclusters', 'search_biclusters');
 
 ?>

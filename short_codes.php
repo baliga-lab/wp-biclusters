@@ -641,6 +641,23 @@ function gene_gre_browser_shortcode($attr, $content)
     return $content;
 }
 
+function search_box_shortcode($attr, $content)
+{
+    $content = "<form action=\"" . esc_url(admin_url('admin-post.php')) .  "\" method=\"post\">";
+    $content .= "Search Term: <input name=\"search_term\" type=\"text\"></input>";
+    $content .= "<div style=\"margin-top: 5px;\"><input type=\"submit\" value=\"Search\"></input></div>";
+    $content .= "<input type=\"hidden\" name=\"action\" value=\"search_biclusters\">";
+    $content .= "</form>";
+    return $content;
+}
+
+function search_results_shortcode($attr, $content)
+{
+    $search_term = $_GET['search_term'];
+    $content = "Search Term: " . $search_term;
+    return $content;
+}
+
 
 function biclusters_add_shortcodes()
 {
@@ -667,6 +684,9 @@ function biclusters_add_shortcodes()
     add_shortcode('condition_blocks', 'condition_blocks_shortcode');
     add_shortcode('bicluster_info', 'bicluster_info_shortcode');
     add_shortcode('condition_biclusters_table', 'condition_biclusters_table_shortcode');
+
+    add_shortcode('biclusters_search_box', 'search_box_shortcode');
+    add_shortcode('biclusters_search_results', 'search_results_shortcode');
 
     // EGRIN2 specific
     add_shortcode('corems_table', 'corems_table_shortcode');
