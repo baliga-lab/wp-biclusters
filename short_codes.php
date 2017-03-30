@@ -657,7 +657,7 @@ function search_results_shortcode($attr, $content)
     $content = "<div>Search Term: " . $search_term . "</div>";
     $solr_server = "http://garda:8983/solr";
     $results_json = file_get_contents($solr_server . "/mtb_clusters/select?indent=on&q=" .
-                                      $search_term . "&wt=json");
+                                      $search_term . "&wt=json&rows=1000");
     $results = json_decode($results_json);
     $num_found = $results->response->numFound;
     $content .= "<div># biclusters found: " . $num_found . "</div>";
