@@ -654,7 +654,21 @@ function search_box_shortcode($attr, $content)
 function search_results_shortcode($attr, $content)
 {
     $search_term = $_GET['search_term'];
-    $content = "Search Term: " . $search_term;
+    $content = "<div>Search Term: " . $search_term . "</div>";
+    $solr_server = "http://garda:8983/solr";
+    $results_json = file_get_contents($solr_server . "/mtb_clusters/select?indent=on&q=" .
+                                      $search_term . "&wt=json");
+    $results = json_decode($results_json);
+    $num_found = $results->response->numFound;
+    $content .= "<div># biclusters found: " . $num_found . "</div>";
+    $biclusters = array();
+    foreach ($results->response->docs as $doc) {
+        $biclusters []= (object) array('id' => $doc->id,
+                                       'num_genes' => count($doc->genes),
+                                       'num_conditions' => count($doc->conditions),
+                                       'residual' => $doc->residual[0]);
+    }
+    $content .= biclusters_table_html($biclusters);
     return $content;
 }
 
