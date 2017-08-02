@@ -574,6 +574,26 @@ function corems_table_html($corems)
     return $content;
 }
 
+function corems_table_html2($corems)
+{
+    $content = "<table id=\"corems\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>Corem ID</th><th># Genes</th><th># Conditions</th></tr></thead>";
+    $content .= "  <tbody>";
+    foreach ($corems as $c) {
+        $content .= "    <tr><td><a href=\"index.php/corem/?corem=" . $c->id . "\">" . $c->id . "</a></td><td>". $c->num_genes . "</td><td>" . $c->num_conditions . "</td></tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#corems').DataTable({";
+    $content .= "    })";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+
 function gene_title_shortcode($attr, $content)
 {
     $gene = get_query_var('gene');
@@ -656,19 +676,37 @@ function search_results_shortcode($attr, $content)
     $search_term = $_GET['search_term'];
     $content = "<div>Search Term: " . $search_term . "</div>";
     $solr_server = "http://garda:8983/solr";
-    $results_json = file_get_contents($solr_server . "/mtb_clusters/select?indent=on&q=" .
+    $core1 = "mtb_corems";
+    $core2 = "mtb_clusters";
+
+    $results_json = file_get_contents($solr_server . "/" . $core1 . "/select?indent=on&q=" .
                                       $search_term . "&wt=json&rows=1000");
     $results = json_decode($results_json);
     $num_found = $results->response->numFound;
-    $content .= "<div># biclusters found: " . $num_found . "</div>";
-    $biclusters = array();
-    foreach ($results->response->docs as $doc) {
-        $biclusters []= (object) array('id' => $doc->id,
+    if ($num_found > 0) {
+        $content .= "<div># corems found: " . $num_found . "</div>";
+        $corems = array();
+        foreach ($results->response->docs as $doc) {
+            $corems []= (object) array('id' => $doc->id,
                                        'num_genes' => count($doc->genes),
-                                       'num_conditions' => count($doc->conditions),
-                                       'residual' => $doc->residual[0]);
+                                       'num_conditions' => count($doc->conditions));
+        }
+        $content .= corems_table_html2($corems);
+    } else {
+        $results_json = file_get_contents($solr_server . "/" . $core2 . "/select?indent=on&q=" .
+                                          $search_term . "&wt=json&rows=1000");
+        $results = json_decode($results_json);
+        $num_found = $results->response->numFound;
+        $content .= "<div># biclusters found: " . $num_found . "</div>";
+        $biclusters = array();
+        foreach ($results->response->docs as $doc) {
+            $biclusters []= (object) array('id' => $doc->id,
+                                           'num_genes' => count($doc->genes),
+                                           'num_conditions' => count($doc->conditions),
+                                           'residual' => $doc->residual[0]);
+        }
+        $content .= biclusters_table_html($biclusters);
     }
-    $content .= biclusters_table_html($biclusters);
     return $content;
 }
 
