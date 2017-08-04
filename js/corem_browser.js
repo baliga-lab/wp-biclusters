@@ -4,6 +4,8 @@ var corem_browser = {};
 
     var MARGIN = {left: 20, bottom: 60, right: 20, top: 20};
     var GENEBAR_HEIGHT = 20;
+    /* at least this much of the gene bar has to be visible at all times*/
+    var GENEBAR_MINX_VISIBLE = 50;
     var COLORS = ['red', 'green', 'blue', 'cyan', 'magenta', 'orange', 'purple',
                   'AquaMarine', 'BlueViolet', 'Brown', 'BurlyWood', 'CadetBlue', 'Chartreuse',
                   'Chocolate', 'Coral', 'CornflowerBlue', 'Crimson', 'DarkBlue', 'DarkCyan',
@@ -21,8 +23,25 @@ var corem_browser = {};
     // module global chart scale, we might want to switch to an instance
     var xScale, yScale, xAxis, yAxis;
 
-    function drawAxes(chart, options, domain) {
-        xScale = d3.scaleLinear().domain([domain.minx - 1, domain.maxx + 1]).range([0, options.width]);
+    function drawAxes(chart, options, domain, gene) {
+        var minGeneX = Math.min(gene.start, gene.stop);
+        var maxGeneX = Math.max(gene.start, gene.stop);
+        var minx = domain.minx, maxx = domain.maxx;
+        var geneLeft = true;
+        /* the start of the gene is too far right off the scale => adjust */
+        if (minGeneX >= maxx - GENEBAR_MINX_VISIBLE) {
+            maxx = minGeneX + GENEBAR_MINX_VISIBLE;
+        }
+        /* the end of the gene is too far left off the scale => adjust */
+        if (maxGeneX <= minx + GENEBAR_MINX_VISIBLE) {
+            minx = maxGeneX - GENEBAR_MINX_VISIBLE;
+        }
+        /* only the right portion of the gene is displayed */
+        if (minGeneX < minx) {
+            geneLeft = false;
+        }
+
+        xScale = d3.scaleLinear().domain([minx - 1, maxx + 1]).range([0, options.width]);
         yScale = d3.scaleLinear().domain([domain.miny, domain.maxy + 1]).range([options.height, 0]);
         xAxis = d3.axisBottom(xScale).ticks(10);
         yAxis = d3.axisLeft(yScale).ticks(5);
@@ -41,6 +60,7 @@ var corem_browser = {};
             .style("text-anchor", "middle")
             .attr("dy", ".1em")
             .text("GRE count");
+        return geneLeft;
     }
 
     function drawCurve(chart, options, id, data, color) {
@@ -172,11 +192,12 @@ var corem_browser = {};
         jQuery(coremPanelSelector).html(content);
     }
 
-    function drawGeneBar(chart, options, gene) {
+    function drawGeneBar(chart, options, gene, geneLeft) {
         var genebarY = options.height + (MARGIN.bottom - (GENEBAR_HEIGHT + 5));
         var genebarX1 = gene.start < gene.stop ? xScale(gene.start) : xScale(gene.stop);
         var genebarX2 = gene.start < gene.stop ? xScale(gene.stop) : xScale(gene.start);
         var genebarWidth = Math.abs(genebarX2 - genebarX1);
+        var geneLabelX = geneLeft ? genebarX1 : genebarX2 - 80;
 
         chart.append('rect')
             .attr("x", genebarX1)
@@ -186,7 +207,7 @@ var corem_browser = {};
             .style("stroke", "black")
             .append("title").text(function(d) { return gene.name + ' (' + gene.start + '-' + gene.stop + ')'; });
         chart.append("text")
-            .attr("x", genebarX1)
+            .attr("x", geneLabelX)
             .attr("y", genebarY + GENEBAR_HEIGHT / 2)
             .attr("dy", ".35em")
             .text(options.gene);
@@ -223,7 +244,7 @@ var corem_browser = {};
                       makeGREPanel(grePanelSelector, gres, initialMinGRECount);
 
                       var domain = initDomain(data);
-                      drawAxes(chart, options, domain);
+                      var geneLeft = drawAxes(chart, options, domain, gene);
 
                       for (var i in gres) {
                           var gredata = data.gres[gres[i]];
@@ -245,7 +266,7 @@ var corem_browser = {};
                           .attr("dy", ".1em")
                           .text("no GREs available");
                   }
-                  drawGeneBar(chart, options, gene);
+                  drawGeneBar(chart, options, gene, geneLeft);
                   drawTSSSite(chart, options, data.tss);
 
                   // first time should set visibility
