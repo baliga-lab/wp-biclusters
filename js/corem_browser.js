@@ -74,16 +74,17 @@ var corem_browser = {};
         curves[id] = curve;
     }
 
-    function drawChipseqPeak(chart, options, chipseqPeaks, tf) {
+    function drawChipseqPeak(chart, options, chipseqPeaks, tf, i) {
         var color = '#ff0000';
         var line = d3.line()
             .x(function(d) { return xScale(d.pos); })
             .y(function(d) { return yScale(d.value); });
         var id = 'chippeak_' + tf;
         var pos = chipseqPeaks[tf];
+        var y = greMaxValue - ((greMaxValue / 15) * i);
         var linedata1 = [
             {pos: pos, value: 0},
-            {pos: pos, value: greMaxValue}
+            {pos: pos, value: y}
         ];
         chipPeakCurves[id] = chart.append("path")
             .datum(linedata1)
@@ -94,7 +95,7 @@ var corem_browser = {};
             .style('stroke-width', '3');
         chart.append('text')
             .attr('x', xScale(pos))
-            .attr('y', yScale(greMaxValue))
+            .attr('y', yScale(y))
             .style('stroke', color)
             .text(tf);
     }
@@ -103,7 +104,7 @@ var corem_browser = {};
         var chipseqTFs = Object.keys(chipseqPeaks), tf, i, curve, id, linedata, position;
         for (i = 0; i < chipseqTFs.length; i++) {
             tf = chipseqTFs[i];
-            drawChipseqPeak(chart, options, chipseqPeaks, tf);
+            drawChipseqPeak(chart, options, chipseqPeaks, tf, i);
         }
     }
 
