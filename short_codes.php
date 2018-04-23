@@ -304,8 +304,20 @@ function corem_title_shortcode($attr, $content)
 function corem_coexpressions_graph_shortcode($attr, $content)
 {
     $corem_id = get_query_var('corem');
+
+    $source_url = get_option('source_url', '');
+    $blocks_json = file_get_contents($source_url . "/api/v1.0.0/corem_condition_enrichment/" . $corem_id);
+    $blocks = json_decode($blocks_json)->condition_blocks;
+
     $content = "<div style=\"width: 100%;\"><img id=\"coexp_help\" style=\"width: 18px; float: right\" src=\"" . esc_url(plugins_url('images/help.png', __FILE__)). "\"></div>\n";
-    $content .= '<div id="corem_coexps" style="width: 100%; height: 300px"></div>';
+    $content .= '<h4>Condition Blocks</h4>';
+    $content .= '<ul style="list-style-type: none">';
+    $content .= '  <li><input id="ccb_0" type="checkbox" value="0" checked></input> All</li>';
+    foreach ($blocks as $i=>$b) {
+        $content .= '  <li><input id="ccb_' . $b->id . '" type="checkbox" value="' . $b->id . '"></input> ' . $b->name . '</li>';
+    }
+    $content .= '</ul>';
+    $content .= '<div id="corem_coexps" style="width: 100%; height: 300px"></div>\n';
     $content .= "<script>\n";
     $content .= "    function makeCoCoExpChart(data, conds) {";
     $content .= "      var x, chart = Highcharts.chart('corem_coexps', {\n";
@@ -329,6 +341,16 @@ function corem_coexpressions_graph_shortcode($attr, $content)
     $content .= "      data: {'action': 'corem_coexps_dt', 'corem': " . $corem_id ."}\n";
     $content .= "    }).done(function(data) {\n";
     $content .= "      makeCoCoExpChart(data.expressions, data.conditions);\n";
+    $content .= "    });\n";
+    $content .= "    jQuery('input[id^=\"ccb_\"]').click(function() {\n";
+    $content .= "        console.log('click: ' + this.id);\n";
+    $content .= "        if (this.id == 'ccb_0') {\n";
+    $content .= "          jQuery('input[id^=\"ccb_\"]').attr('checked', false);\n";
+    $content .= "          jQuery('#ccb_0').attr('checked', true);\n";
+    $content .= "        } else {\n";
+    $content .= "          jQuery('#ccb_0').attr('checked', false);\n";
+    $content .= "        }\n";
+    // reload the graph with changed
     $content .= "    });\n";
     $content .= "  });\n";
     $content .= "</script>\n";
