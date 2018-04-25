@@ -317,7 +317,7 @@ function corem_coexpressions_graph_shortcode($attr, $content)
         $content .= '  <li><input id="ccb_' . $b->id . '" type="checkbox" value="' . $b->id . '"></input> ' . $b->name . '</li>';
     }
     $content .= '</ul>';
-    $content .= '<div id="corem_coexps" style="width: 100%; height: 300px"></div>\n';
+    $content .= '<div id="corem_coexps" style="width: 100%; height: 300px"></div>';
     $content .= "<script>\n";
     $content .= "    function makeCoCoExpChart(data, conds) {";
     $content .= "      var x, chart = Highcharts.chart('corem_coexps', {\n";
@@ -333,23 +333,32 @@ function corem_coexpressions_graph_shortcode($attr, $content)
     $content .= "     })\n";
     $content .= "   }\n";
 
-    $content .= "  jQuery(document).ready(function() {\n";
-    $content .= "    jQuery('#coexp_help').qtip({ content: 'Hover over data points to see condition and value information' });";
+    $content .= "  function loadCoremCoexpressions(coremId, blocks) {\n";
     $content .= "    jQuery.ajax({\n";
     $content .= "      url: ajax_dt.ajax_url,\n";
     $content .= "      method: 'GET',\n";
-    $content .= "      data: {'action': 'corem_coexps_dt', 'corem': " . $corem_id ."}\n";
+    $content .= "      data: {'action': 'corem_coexps_dt', 'corem': " . $corem_id .", 'blocks': blocks }\n";
     $content .= "    }).done(function(data) {\n";
     $content .= "      makeCoCoExpChart(data.expressions, data.conditions);\n";
     $content .= "    });\n";
+    $content .= "  };\n";
+
+
+    $content .= "  jQuery(document).ready(function() {\n";
+    $content .= "    jQuery('#coexp_help').qtip({ content: 'Hover over data points to see condition and value information' });\n";
+    $blocks = array(0);
+    $content .= "    loadCoremCoexpressions(" . $corem_id . ", [" . implode(",", $blocks) . "]);\n";
     $content .= "    jQuery('input[id^=\"ccb_\"]').click(function() {\n";
-    $content .= "        console.log('click: ' + this.id);\n";
     $content .= "        if (this.id == 'ccb_0') {\n";
     $content .= "          jQuery('input[id^=\"ccb_\"]').attr('checked', false);\n";
     $content .= "          jQuery('#ccb_0').attr('checked', true);\n";
     $content .= "        } else {\n";
     $content .= "          jQuery('#ccb_0').attr('checked', false);\n";
     $content .= "        }\n";
+    $content .= "        var checked = jQuery('input[id^=\"ccb_\"]:checked');\n";
+    $content .= "        var selectedArr = [];\n";
+    $content .= "        jQuery.each(checked, function(i, e) { selectedArr.push(e.id.substring(4)); });\n";
+    $content .= "        loadCoremCoexpressions(" . $corem_id . ", selectedArr);";
     // reload the graph with changed
     $content .= "    });\n";
     $content .= "  });\n";

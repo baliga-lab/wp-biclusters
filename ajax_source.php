@@ -88,9 +88,10 @@ EOT;
 function corem_coexps_dt_callback() {
     header("Content-type: application/json");
     $corem = $_GET['corem'];  // integer
-
+    $blocks = $_GET['blocks'];
+    $blocks_arg = implode(',', $blocks);
     $source_url = get_option('source_url', '');
-    $exps_json = file_get_contents($source_url . "/api/v1.0.0/corem_expressions/" . $corem);
+    $exps_json = file_get_contents($source_url . "/api/v1.0.0/corem_expressions/" . $corem . "?blocks=" . $blocks_arg);
     $exps = json_decode($exps_json);
     $conditions = json_encode($exps->conditions);
     $expdata = array();

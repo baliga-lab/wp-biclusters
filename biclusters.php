@@ -71,6 +71,7 @@ function add_query_vars_filter($vars) {
     $vars[] = "condition";
     $vars[] = "gene";
     $vars[] = "corem";
+    $vars[] = "blocks";
     $vars[] = "search_term";
     return $vars;
 }
