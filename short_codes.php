@@ -314,7 +314,9 @@ function corem_coexpressions_graph_shortcode($attr, $content)
     $content .= '<ul style="list-style-type: none">';
     $content .= '  <li><input id="ccb_0" type="checkbox" value="0" checked></input> All</li>';
     foreach ($blocks as $i=>$b) {
-        $content .= '  <li><input id="ccb_' . $b->id . '" type="checkbox" value="' . $b->id . '"></input> ' . $b->name . '</li>';
+        if ($b->num_conditions >= 10) {
+            $content .= '  <li><input id="ccb_' . $b->id . '" type="checkbox" value="' . $b->id . '"></input> ' . $b->name . '</li>';
+        }
     }
     $content .= '</ul>';
     $content .= '<div id="corem_coexps" style="width: 100%; height: 300px"></div>';
