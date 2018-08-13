@@ -31,10 +31,13 @@ function biclusters_settings_init() {
     );
     add_settings_field('source_url', 'Data Source URL', 'source_url_field_cb', 'general',
                        'general_section');
+    add_settings_field('solr_url', 'Solr Base URL', 'solr_url_field_cb', 'general',
+                       'general_section');
     add_settings_field('bicluster_slug', 'Bicluster Slug', 'slug_field_cb', 'general',
                        'general_section');
 
     register_setting('general', 'source_url');
+    register_setting('general', 'solr_url');
     register_setting('general', 'bicluster_slug');
 }
 
@@ -47,6 +50,12 @@ function source_url_field_cb()
 {
     $url = get_option('source_url', '');
     echo "<input type=\"text\" name=\"source_url\" value=\"" . $url . "\">";
+}
+
+function solr_url_field_cb()
+{
+    $url = get_option('solr_url', '');
+    echo "<input type=\"text\" name=\"solr_url\" value=\"" . $url . "\">";
 }
 
 function slug_field_cb()

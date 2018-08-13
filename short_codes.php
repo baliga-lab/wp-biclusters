@@ -706,11 +706,12 @@ function search_box_shortcode($attr, $content)
 
 function search_results_shortcode($attr, $content)
 {
+    $solr_server = get_option('solr_url', '');
     $search_term = $_GET['search_term'];
     $content = "<div>Search Term: " . $search_term . "</div>";
-    $solr_server = "http://garda:8983/solr";
-    $core1 = "mtb_corems";
-    $core2 = "mtb_clusters";
+    //$solr_server = "http://garda:8983/solr";
+    $core1 = "mtb_egrin2_corems";
+    $core2 = "mtb_egrin2_clusters";
 
     $results_json = file_get_contents($solr_server . "/" . $core1 . "/select?indent=on&q=" .
                                       $search_term . "&wt=json&rows=1000");
